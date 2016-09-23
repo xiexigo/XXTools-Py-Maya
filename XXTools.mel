@@ -1,0 +1,2787 @@
+//###############################################################################################
+//#	XX Tools, Version 11.04.23								#
+//#	By Xie Xi				email:chirpGo@gmail.com				#
+//###############################################################################################
+
+//◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆
+//◆◆◆◆  Create Menu   ◆◆◆◆
+//◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆
+
+global proc XXT_menu(){
+
+	global string $gMainWindow;
+
+	setParent $gMainWindow;
+
+	if(`menu -ex "XXToolsMenu"`)deleteUI XXToolsMenu;
+
+	menu -l "XX Tools"
+		-p MayaWindow
+		-to 1
+		-aob true
+		XXToolsMenu;
+
+	menuItem -sm true -l "create";
+		menuItem -l "Helix Curve"
+			-ann "Create Helix Curve"
+			-c "helixCurveOpi()";
+		setParent -menu ..;
+	menuItem -divider true;
+
+	menuItem -l "Batch Set Single Face"
+	-ann "Set The Selected Objects Double Sided Off"
+	-echoCommand true
+	-c "multiSingleSided"
+	multiSingleSidedItem;
+
+	menuItem -l "Batch Set Opposite Off"
+	-ann "Set The Selected Objects Opposite Off"
+	-c "setNormalPositiveOpi 0";
+	menuItem -c "setNormalPositiveOpi 1"
+	-ob true;
+
+	menuItem -l "Batch Set Polygon Attribute"
+	-ann "Set Attribute Of The Selected Polygons"
+	-c "batchSetAttrOpi";
+
+	menuItem -divider true;		//----------------------------------------
+
+	menuItem -l "Make The Face Plane"
+	-ann "Make the face that first selected plane"
+	-c "makeFacesPlane()";
+
+	menuItem -l "White Mirror Info With X"
+	-ann "Write Mirror Info With X"
+	-c "vtxMirrorInfo(firstSelectedMesh())";
+
+	menuItem -l "Make Mirror With X"
+	-ann "Make the Mesh Mirror With X"
+	-c "";
+
+	menuItem -l "Spin Edge"
+	-ann "Spin Edge in Two Face"
+	-c "spinE()";
+
+	menuItem -l "Select Vertexes X=0"
+	-ann "Select Vertexes X=0"
+	-c "";
+
+	menuItem -l "Select Duplicate Face"
+	-ann "Select Duplicate Face"
+	-c "select(filterDuplicateFace())";
+
+	menuItem -l "Select Overlaping Face"
+	-ann "Select Overlaping Face"
+	-c "select(filterOverlapingFace());";
+
+	menuItem -l "Align Pivot"
+	-ann "Align Object to Its Pivot And Reset The Pivot"
+	-c "ResetToPivot";
+
+	menuItem -l "Reset Local Pivot"
+	-ann "Reset Local Pivot Without Change Position"
+	-c "resetLocalPivot()";
+
+	menuItem -l "Replace Object"
+	-ann "Replace Selected Object To The Gived Object"
+	-c "objReplaceOpi";
+
+	menuItem -l "Random Transform"
+	-ann "Give The Selected Object Random Translate, Rotate And Scale"
+	-c "randomTransformOpi";
+
+	menuItem -l "Order By Distance"
+	-ann "Order The Selected Object By Their Distance Form Gived Point"
+	-c "orderByDistanceOpi";
+
+	menuItem -l "Select Not Quad"
+	-ann "select Faces which are not Quad"
+	-c "select(notQuadFaces())";
+
+	menuItem -divider true;		//----------------------------------------
+
+	menuItem -l "Reset Pnts"
+	-ann "Reset Pnts"
+	-c "resetPnts()";
+
+	menuItem -divider true;		//----------------------------------------
+
+	menuItem -l "Distance Of Points"
+	-ann "Print Distance Of two Points"
+	-c "{string $sel[]=filterExpand(\"-ex\",true,\"-sm\",31);print(distanceOfPoints($sel[0],$sel[1]));}";
+
+	menuItem -l "Length Of Edge"
+	-ann "Print Length Of Edge"
+	-c "{string $sel[]=filterExpand(\"-ex\",true,\"-sm\",32);print(edgesLength($sel[0]));}";
+
+	menuItem -divider true;		//----------------------------------------
+
+	menuItem -l "UV Tools"
+	-ann "UV Tools"
+	-c "uvTools";
+
+	menuItem -l "Vertex Color HSV"
+	-ann "Modify Vertex Color HSV"
+	-c "vtxColorHsvUi";
+
+	menuItem -l "Vertex Color Level"
+	-ann "Modify Vertex Color Level"
+	-c "vtxColorLevelUi";
+
+	menuItem -divider true;		//----------------------------------------
+
+	menuItem -l "Batch Rename"
+	-ann "Rename The Selected Object To Sequence Names"
+	-c "batchRenameOpi";
+	
+	menuItem -l "Delect Selected Namespace"
+	-ann "Delect Selected Namespace"
+	-c "delSelNS()";
+
+	menuItem -l "Delect All Namespace"
+	-ann "Delect All Namespace"
+	-c "delAllNS()";
+	
+	menuItem -l "Normalize Name Of The File Node"
+	-ann "Normalize Rename The Selected File Node In The Filename"
+	-c "texturenames(`ls -sl`)";
+
+	menuItem -l "Normalize Name Of The Material Node"
+	-ann "Normalize Rename The Selected Material Node In The Filename"
+	-c "materialnames(`ls -sl`)";
+
+	menuItem -l "Texture Name Manager"
+	-ann "Rename Texture File In Manager"
+	-c "textureManageOpt()";
+
+	menuItem -l "Material Name Manager"
+	-ann "Rename Material Node And Texture File In Manager"
+	-c "materialManageOpt()";
+
+	menuItem -l "Path Of Texture"
+	-ann "Set File Path Of The Selected Texture Node"
+	-c "texturePathOpi";
+
+	menuItem -l "Type of Texture"
+	-ann "Set File Type Of The Selected Texture Node"
+	-c "textureTypeOpi";
+
+	menuItem -l "Export Texture"
+	-ann "Export Texture To \"Current Project\\textureOut\\\""
+	-c "exportTexture(\"textureOut\")";
+
+	menuItem -divider true;		//----------------------------------------
+
+	menuItem -l "Set Project to Pwd"
+	-ann "Set Project to Current Work Directory"
+	-c "setProjectToPwd";
+
+	menuItem -l "Unlock Selected Nodes"
+	-ann "Unlock Selected Nodes"
+	-c "lockNode -lock off `ls -sl`";
+
+	menuItem -l "Delete Unknown Nodes"
+	-ann "Delete Unknown Nodes"
+	-c "deleteUnknown";
+
+	menuItem -divider true;		//----------------------------------------
+
+	menuItem -l "Auto Bind"
+	-ann "Auto Bind"
+	-c "python(\"xxt.autoBind()\")";
+
+	menuItem -divider true;		//----------------------------------------
+
+	menuItem -l "Close All Windows"
+	-ann "close all windows in maya"
+	-c "closeAllWindows";
+
+	menuItem -divider true;		//----------------------------------------
+
+	menuItem -l "About XX Tools..."
+	-ann "About XX Tools"
+	-c "XXToolsAbout";
+}
+
+//◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆
+//◆◆◆◆   Create UI    ◆◆◆◆
+//◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆
+
+global proc helixCurveOpi()
+{
+if(`window -ex "helixCurveWindow"`)deleteUI helixCurveWindow;
+//create UI
+window -t "Create Helix Curve" -s false -rtf true "helixCurveWindow";
+	columnLayout;
+	rowLayout -nc 3 -cw3 100 200 100 -cl3 "right" "left" "left";
+	text -l "Path Curve:" -fn "boldLabelFont" -w 100;
+	text -l (firstSelected()) "_pathCurve";
+	button -l "Get Path" -c ("	text -e -l \""+firstSelected()+"\" \"_pathCurve\"	");
+	setParent ..;
+
+	rowLayout -nc 2 -cw2 100 200 -cl2 "right" "left";
+	text -l "Coils:" -fn "boldLabelFont" -w 100;
+	intField -min 1 -v 10 "_coils";
+	setParent ..;
+	rowLayout -nc 2 -cw2 100 200 -cl2 "right" "left";
+	text -l "Sub Coil:" -fn "boldLabelFont" -w 100;
+	intField -min 2 -v 4 "_subCoil";
+	setParent ..;
+	rowLayout -nc 2 -cw2 100 200 -cl2 "right" "left";
+	text -l "Radius:" -fn "boldLabelFont" -w 100;
+	floatField -v 1 "_radius";
+	setParent ..;
+	rowLayout -nc 2 -cw2 100 200 -cl2 "right" "left";
+	text -l "Scale:" -fn "boldLabelFont" -w 100;
+	floatField -v 1 "_scale";
+	setParent ..;
+	rowLayout -nc 2 -cw2 100 200 -cl2 "right" "left";
+	text -l "Direction:" -fn "boldLabelFont" -w 100;
+	intField -v 1 "_direction";
+	setParent ..;
+
+	rowLayout -nc 2 -cw2 200 200 -ct2 "right" "left";
+	button -l "Create" -c "helixCurve (text(\"-q\",\"-l\",\"_pathCurve\")) (intField(\"-q\",\"-v\",\"_coils\")) (intField(\"-q\",\"-v\",\"_subCoil\")) (floatField(\"-q\",\"-v\",\"_radius\")) (floatField(\"-q\",\"-v\",\"_scale\")) (intField(\"-q\",\"-v\",\"_direction\"))";
+	button -l "Close";
+showWindow helixCurveWindow;
+}
+
+global proc objReplaceOpi()
+{
+if(`window -ex "objReplaceWindow"`)deleteUI objReplaceWindow;
+//create UI
+window -t "Replace The Selectd Objects" -s false -rtf true "objReplaceWindow";
+	columnLayout;
+		rowLayout -nc 2 -cw2 100 200;
+		text -l "Rename";
+		textField -w 200 -ed off "_newname";
+		setParent ..;
+		checkBox -label "Instance" "_ins";
+		checkBox -label "Keep Original" -v off -onc "checkBox -e -v off \"_kn\";textField -e -ed on \"_newname\"" "_ko";
+		checkBox -label "Keep Name" -v on -onc "checkBox -e -v off \"_ko\";textField -e -ed off \"_newname\"" -ofc "textField -e -ed on \"_newname\"" "_kn";
+
+		separator;
+
+		checkBox -label "Inherits Translate" -v on "_it";
+		checkBox -label "Inherits Rotate" -v on "_ir";
+		checkBox -label "Inherits Scale" -v on "_is";
+		checkBox -label "Basis Pivot" -v off "_up";
+
+		rowLayout -nc 2 -cw2 150 150 -cl2 "center" "center";
+		button -l "OK" -w 150 -c "objReplace(`textField -q -text \"_newname\"`, `checkBox -q -v \"_ins\"`, `checkBox -q -v \"_ko\"`, `checkBox -q -v \"_kn\"`, `checkBox -q -v \"_it\"` + `checkBox -q -v \"_ir\"`*2 + `checkBox -q -v \"_is\"`*4, `checkBox -q -v \"_up\"`)";
+		button -l "Cancel" -w 150  -c "deleteUI objReplaceWindow";
+
+	showWindow objReplaceWindow;
+}
+///////////////////////
+
+
+global proc randomTransformOpi()
+{
+if(`window -ex "randomTransformWindow"`)deleteUI randomTransformWindow;
+//create UI
+window -t "Randem TransForm" -s false -rtf true "randomTransformWindow";
+	columnLayout -adj on;
+	rowLayout -nc 5 -cw5 80 80 80 80 80 -cl5 "center" "center" "center" "center" "center";
+		text -l "";text -l "X";text -l "Y";text -l "Z";text -l "";
+		setParent ..;
+		floatFieldGrp -nf 3 -l "Translate Min" -cw4 80 80 80 80 -v1 0 -v2 0 -v3 0 "_translateMin";
+		rowLayout -nc 2 -cw2 320 80;
+		floatFieldGrp -nf 3 -l "Translate Max" -cw4 80 80 80 80 -v1 0 -v2 0 -v3 0 "_translateMax";
+		button -l "Translate" -c "randomTransform(0,`checkBox -q -v \"_lockRatio\"`,`checkBox -q -v \"_abs\"`,`floatFieldGrp -q -v1 \"_translateMin\"`,`floatFieldGrp -q -v1 \"_translateMax\"`,`floatFieldGrp -q -v2 \"_translateMin\"`,`floatFieldGrp -q -v2 \"_translateMax\"`,`floatFieldGrp -q -v3 \"_translateMin\"`,`floatFieldGrp -q -v3 \"_translateMax\"`)";
+		setParent ..;
+		floatFieldGrp -nf 3 -l "Rotate Min" -cw4 80 80 80 80 -v1 0 -v2 0 -v3 0 "_rotateMin";
+		rowLayout -nc 2 -cw2 320 80;
+		floatFieldGrp -nf 3 -l "Rotate Max" -cw4 80 80 80 80 -v1 0 -v2 0 -v3 0 "_rotateMax";
+		button -l "Rotate" -c "randomTransform(1,`checkBox -q -v \"_lockRatio\"`,`checkBox -q -v \"_abs\"`,`floatFieldGrp -q -v1 \"_rotateMin\"`,`floatFieldGrp -q -v1 \"_rotateMax\"`,`floatFieldGrp -q -v2 \"_rotateMin\"`,`floatFieldGrp -q -v2 \"_rotateMax\"`,`floatFieldGrp -q -v3 \"_rotateMin\"`,`floatFieldGrp -q -v3 \"_rotateMax\"`)";
+		setParent ..;
+		floatFieldGrp -nf 3 -l "Scale Min" -cw4 80 80 80 80 -v1 0 -v2 0 -v3 0 "_scaleMin";
+		rowLayout -nc 2 -cw2 320 80;
+		floatFieldGrp -nf 3 -l "Scale Max" -cw4 80 80 80 80 -v1 0 -v2 0 -v3 0 "_scaleMax";
+		button -l "Scale" -c "randomTransform(2,`checkBox -q -v \"_lockRatio\"`,`checkBox -q -v \"_abs\"`,`floatFieldGrp -q -v1 \"_scaleMin\"`,`floatFieldGrp -q -v1 \"_scaleMax\"`,`floatFieldGrp -q -v2 \"_scaleMin\"`,`floatFieldGrp -q -v2 \"_scaleMax\"`,`floatFieldGrp -q -v3 \"_scaleMin\"`,`floatFieldGrp -q -v3 \"_scaleMax\"`)";
+		setParent ..;
+		rowLayout -nc 1 -ct1 "left" -co1 80;
+		checkBox -l "Abs" -v on "_abs";
+		setParent ..;
+		rowLayout -nc 1 -ct1 "left" -co1 80;
+		checkBox -l "Ratio Lock" -v off "_lockRatio";
+		setParent ..;
+		button -l "Close" -c "deleteUI randomTransformWindow";
+
+	showWindow randomTransformWindow;
+}
+////////////////////////////////////
+
+
+global proc batchRenameOpi()
+{
+if(`window -ex "batchRenameWindow"`)deleteUI batchRenameWindow;
+//create UI
+window -t "Batch Rename" -s false -rtf true "batchRenameWindow";
+	string $form = `formLayout`;
+	string $tabs = `tabLayout -innerMarginWidth 5 -innerMarginHeight 5`;
+	formLayout -edit
+		-attachForm $tabs "top"    0
+ 		-attachForm $tabs "left"   0
+ 		-attachForm $tabs "bottom" 0
+ 		-attachForm $tabs "right"  0
+ 		$form;
+
+ 		string $tab1 = `rowColumnLayout -nc 2`;
+			text -l "BASE Name";		textField -w 100 "_baseName";
+			radioCollection "_methed";
+			radioButton -label "Prefix" "pre";	radioButton -label "Suffix" -sl "suf";
+			radioButton
+				-label "Insert In Position"
+				-onc "textField -e -en 0 \"_baseName\"\;intField -e -en 1 \"_position\""
+				-ofc "textField -e -en 1 \"_baseName\"\;intField -e -en 0 \"_position\""
+				"ins";
+			intField -w 100 -v 1 -min 1 -en 0 "_position";
+			text -l "Wildcard[MAX:8]";	intField -w 100 -v 2 -step 1 -min 1 -max 8 "_place";
+			text -l "Start from";		intField -w 100 -v 1 -step 1 -min 0 "_from";
+
+			button -l "OK" -w 90 -c "serialRename(radioCollection(\"-q\",\"-sl\",\"_methed\"),textField(\"-q\",\"-text\",\"_baseName\"),intField(\"-q\",\"-v\",\"_place\"),intField(\"-q\",\"-v\",\"_from\"),intField(\"-q\",\"-v\",\"_position\"))";
+			button -l "Cancel" -w 90  -c "deleteUI batchRenameWindow";
+			setParent ..;
+
+ 		string $tab2 = `rowColumnLayout -nc 2`;
+ 			text -l "Find";			textField -w 100 "_find";
+ 			text -l "Replace";		textField -w 100 "_replace";
+
+			button -l "OK" -w 90 -c "replaceRename(textField(\"-q\",\"-text\",\"_find\"),textField(\"-q\",\"-text\",\"_replace\"))";
+			button -l "Cancel" -w 90  -c "deleteUI batchRenameWindow";
+ 			setParent ..;
+
+		string $tab3 = `rowColumnLayout -nc 2`;
+			text -l "Insert Position:";	intField -w 100 "_insPos";
+			text -l "Insert Content:";	textField -w 100 "_insContent";
+
+			button -l "OK" -w 90 -c "insertRename(intField(\"-q\",\"-v\",\"_insPos\"),textField(\"-q\",\"-text\",\"_insContent\"))";
+			button -l "Cancel" -w 90  -c "deleteUI batchRenameWindow";
+ 			setParent ..;
+
+ 		tabLayout -edit
+ 			-tabLabel $tab1 "Serial" -tabLabel $tab2 "Replace" -tabLabel $tab3 "Insert"
+ 			$tabs;
+
+ 	showWindow batchRenameWindow;
+}
+///////////////////////
+
+
+global proc texturePathOpi()
+{
+if(`window -ex "texturePathWindow"`)deleteUI texturePathWindow;
+//create UI
+window -t "Texture Path" -s false -rtf true "texturePathWindow";
+	columnLayout;
+		rowLayout -nc 2 -cw2 70 100;
+		text -l "Texture Path";
+		textField -w 100 -tx "sourceimages/" -ec "texturePath(`textField -q -text \"_texPath\"`)" "_texPath";
+		setParent ..;
+
+		rowLayout -nc 2 -cw2 85 85 -cl2 "center" "center";
+		button -l "OK" -w 85 -c "texturePath(`textField -q -text \"_texPath\"`)";
+		button -l "Cancel" -w 85  -c "deleteUI texturePathWindow";
+
+	showWindow texturePathWindow;
+}
+////////////////////////
+
+global proc textureTypeOpi()
+{
+if(`window -ex "textureTypeWindow"`)deleteUI textureTypeWindow;
+//create UI
+window -t "Texture Type" -s false -rtf true "textureTypeWindow";
+	columnLayout;
+		rowLayout -nc 2 -cw2 70 100;
+		text -l "Texture Type";
+		textField -w 100 -ec "textureType(`textField -q -text \"_texType\"`)" "_texType";
+		setParent ..;
+
+		rowLayout -nc 2 -cw2 85 85 -cl2 "center" "center";
+		button -l "OK" -w 85 -c "textureType(`textField -q -text \"_texType\"`)";
+		button -l "Cancel" -w 85  -c "deleteUI texturePathWindow";
+
+	showWindow textureTypeWindow;
+}
+////////////////////////
+
+global proc setNormalPositiveOpi(int $opi)
+{
+//read values
+if ( !`optionVar -exists XXToolsSNOReverse` ) optionVar -iv "XXToolsSNOReverse" 1;
+$ReverseNormal = `optionVar -q XXToolsSNOReverse`;
+if ($opi == 1){
+    //create UI
+    if(`window -exists "setNormalPositiveWindow"`)deleteUI setNormalPositiveWindow;
+    window -t "Set Opposite Off" -s false -rtf true "setNormalPositiveWindow";
+        columnLayout -adj true -rs 10 -cat "both" 10  parameters;
+            checkBox
+                -label "Reverse Normal"
+                -v $ReverseNormal
+                -align "left"
+                "_reverseNormal";
+            setParent ..;
+
+            rowLayout -nc 2 -cl2 "center" "center";
+            button -l "OK" -w 50 -c "setNormalPositive(`checkBox -q -v \"_reverseNormal\"`)" -al "center";
+            button -l "Cancel" -w 50  -c "deleteUI setNormalPositiveWindow" -al "center";
+    //show Window
+	showWindow setNormalPositiveWindow;
+}
+else{
+	setNormalPositive($ReverseNormal);
+	}
+}
+
+global proc batchSetAttrOpi()
+{
+//create UI
+if(`window -exists "batchSetAttrWindow"`)deleteUI batchSetAttrWindow;
+window -t "Batch Set Attribute" -s true -rtf true -w 400 "batchSetAttrWindow";
+formLayout "_main";
+	scrollLayout -cr true -w 350 -h 700 "_scroll";
+		frameLayout -label "Mesh Component Display" -cll true -bs "etchedOut" -labelAlign "top";
+			columnLayout -adjustableColumn 1 -cal "left";
+				checkBox
+					-l "Display Vertices"
+					-v false
+					-cc "batchSetAttr(\"displayVertices\",`checkBox -q -v _displayVertices`,\"\")"
+					_displayVertices;
+
+				checkBox
+					-l "Vertex Backface Culling"
+					-v true
+					-cc "batchSetAttr(\"vertexBackfaceCulling\",`checkBox -q -v _vertexBackfaceCulling`,\"\")"
+					_vertexBackfaceCulling;
+
+				optionMenuGrp
+					-l "Backface Culling"
+					-cc "batchSetAttr(\"backfaceCulling\",`optionMenuGrp -q -sl _backfaceCulling`-1,\"\")"
+					_backfaceCulling;
+						menuItem -l "off";
+						menuItem -l "wire";
+						menuItem -l "hard";
+						menuItem -l "full";
+
+				separator;
+
+				optionMenuGrp
+					-l "Display Edges"
+					-cc "batchSetAttr(\"displayEdges\",`optionMenuGrp -q -sl _displayEdges`-1,\"\")"
+					_displayEdges;
+						menuItem -l "standard";
+						menuItem -l "softHard";
+						menuItem -l "onlyHard";
+
+				checkBox
+					-l "Display Borders"
+					-v true
+					-cc "batchSetAttr(\"displayBorders\",`checkBox -q -v _displayBorders`,\"\")"
+					_displayBorders;
+
+				floatFieldGrp
+					-l "Border Width"
+					-pre 3
+					-v1 2
+					-cc "batchSetAttr(\"borderWidth\",`floatFieldGrp -q -v1 _borderWidth`,\"\")"
+					_borderWidth;
+
+				separator;
+
+				checkBox
+					-l "Display Center"
+					-v false
+					-cc "batchSetAttr(\"displayCenter\",`checkBox -q -v _displayCenter`,\"\")"
+					_displayCenter;
+
+				checkBox
+					-l "Display Triangles"
+					-v false
+					-cc "batchSetAttr(\"displayTriangles\",`checkBox -q -v _displayTriangles`,\"\")"
+					_displayTriangles;
+
+				checkBox
+					-l "Display UVs"
+					-v false
+					-cc "batchSetAttr(\"displayUVs\",`checkBox -q -v _displayUVs`,\"\")"
+					_displayUVs;
+
+				checkBox
+					-l "Display Non Planar"
+					-v false
+					-cc "batchSetAttr(\"displayNonPlanar\",`checkBox -q -v _displayNonPlanar`,\"\")"
+					_displayNonPlanar;
+
+				checkBoxGrp -numberOfCheckBoxes 4
+					-label "Show Item Numbers"
+					-la4 "Vertices" "Edges" "Face" "UVs"
+					-cc "batchSetAttr(\"displayItemNumbers\",`checkBoxGrp -q -v1 _displayItemNumbers`*33554432+`checkBoxGrp -q -v2 _displayItemNumbers`*67108864+`checkBoxGrp -q -v3 _displayItemNumbers`*134217728+`checkBoxGrp -q -v4 _displayItemNumbers`*268435456,\"\")"
+					_displayItemNumbers;
+
+				separator;
+
+				checkBox
+					-l "Display Colors"
+					-v false
+					-cc "batchSetAttr(\"displayColors\",`checkBox -q -v _displayColors`,\"\")"
+					_displayColors;
+
+				optionMenuGrp
+					-l "Display Color Channel"
+					-cc "batchSetAttr(\"displayColorChannel\",`optionMenuGrp -q -sl _displayColorChannel`-1,`optionMenuGrp -q -v _displayColorChannel`)"
+					_displayColorChannel;
+						menuItem -l "None";
+						menuItem -l "Ambient";
+						menuItem -l "Ambient+Diffuse";
+						menuItem -l "Diffuse";
+						menuItem -l "Specular";
+						menuItem -l "Emission";
+
+				optionMenuGrp
+					-l "Material Blend"
+					-cc "batchSetAttr(\"materialBlend\",`optionMenuGrp -q -sl _materialBlend`-1,\"\")"
+					_materialBlend;
+						menuItem -l "overwrite";
+						menuItem -l "add";
+						menuItem -l "subtract";
+						menuItem -l "multiply";
+						menuItem -l "divide";
+						menuItem -l "average";
+						menuItem -l "modulate2x";
+
+				separator;
+
+				checkBox
+					-l "Display Normal"
+					-v false
+					-cc "batchSetAttr(\"displayNormal\",`checkBox -q -v _displayNormal`,\"\")"
+					_displayNormal;
+
+				floatFieldGrp
+					-l "Normal Size"
+					-pre 3
+					-v1 0.4
+					-cc "batchSetAttr(\"normalSize\",`floatFieldGrp -q -v1 _normalSize`,\"\")"
+					_normalSize;
+
+				optionMenuGrp
+					-l "Normal Type"
+					-cc "batchSetAttr(\"normalType\",`optionMenuGrp -q -sl _normalType`,\"\")"
+					_normalType;
+						menuItem -l "face";
+						menuItem -l "vtx";
+						menuItem -l "vtxface";
+
+			setParent ..;			//attr
+		setParent ..;				//frame
+	setParent ..;					//firstcolumn
+	columnLayout -adjustableColumn 1 "_bottom";
+		button -l "OK" -c "print(`optionMenuGrp -q -v _displayColorChannel`)" -al "center";
+		button -l "Cancel" -c "deleteUI batchSetAttrWindow" -al "center";
+formLayout -e
+	-attachForm "_scroll" "top" 0
+	-attachForm "_scroll" "left" 0
+	-attachForm "_scroll" "right" 0
+	-attachControl "_scroll" "bottom" 5 "_bottom"
+	-attachForm "_bottom" "bottom" 5
+	-attachForm "_bottom" "left" 5
+	-attachForm "_bottom" "right" 5
+	"_main";
+
+showWindow batchSetAttrWindow;
+
+}
+
+//UV Tools//////////////
+global proc uvTools()
+{
+global float $uvTools_movingDistanceU = 1.0;
+global float $uvTools_movingDistanceV = 1.0;
+global float $uvTools_pivotU = 0.0;
+global float $uvTools_pivotV = 0.0;
+global float $uvTools_scaleU = 1.0;
+global float $uvTools_scaleV = 1.0;
+global float $uvTools_rotate = 0.0;
+global float $uvTools_alignTagetU = 0.0;
+global float $uvTools_alignTagetV = 0.0;
+global float $uvTools_alignSourceU = 0.0;
+global float $uvTools_alignSourceV = 0.0;
+
+if(`window -ex "uvToolsWindow"`)deleteUI "uvToolsWindow";
+//create UI
+window -t "UV Tools" -s false -rtf true "uvToolsWindow";
+	string $form = `formLayout`;
+	string $tabs = `tabLayout -innerMarginWidth 5 -innerMarginHeight 5`;
+	formLayout -edit
+		-attachForm $tabs "top"    0
+ 		-attachForm $tabs "left"   0
+ 		-attachForm $tabs "bottom" 0
+ 		-attachForm $tabs "right"  0
+ 		$form;
+
+ 		string $tab1 = `columnLayout -adj false -cal "center"`;
+			frameLayout -label "UV Rotate & Scale";
+				columnLayout;
+					rowLayout -nc 2 -cw2 220 50 -ct2 "both" "both";
+						floatFieldGrp	-label "Pivot:"
+							-nf 2 -pre 3 -cw3 100 60 60
+							-v1 $uvTools_pivotU
+							-v2 $uvTools_pivotV
+							-cc "$uvTools_pivotU = `floatFieldGrp -q -v1 uv_pivot`;$uvTools_pivotV = `floatFieldGrp -q -v2 uv_pivot`" "uv_pivot";
+						button -l "Pick" -c "vector $pickBounding[] = getUVsBounding();vector $pickCenter = $pickBounding[2];$uvTools_pivotU = $pickCenter.x;$uvTools_pivotV = $pickCenter.y;floatFieldGrp -e -v1 ($pickCenter.x) -v2 ($pickCenter.y) uv_pivot";
+
+					setParent ..;
+					rowLayout -nc 2 -cw2 220 50 -ct2 "both" "both";
+						floatFieldGrp	-label "Scale:"
+							-nf 2 -pre 3 -cw3 100 60 60
+							-v1 $uvTools_scaleU
+							-v2 $uvTools_scaleV
+							-cc "$uvTools_scaleU = `floatFieldGrp -q -v1 uv_scale`;$uvTools_scaleV = `floatFieldGrp -q -v2 uv_scale`" "uv_scale";
+						button -l "Scale" -c "polyEditUV -pu $uvTools_pivotU -pv $uvTools_pivotV -su $uvTools_scaleU -sv $uvTools_scaleV";
+					setParent ..;
+					rowLayout -nc 2 -cw2 220 50 -ct2 "both" "both";
+						floatFieldGrp	-label "Rotate:"
+							-nf 1 -pre 3 -cw2 100 120
+							-v1 $uvTools_rotate
+							-cc "$uvTools_rotate = `floatFieldGrp -q -v1 uv_rotate`" "uv_rotate";
+						button -l "Rotate" -c "polyEditUV -pu $uvTools_pivotU -pv $uvTools_pivotV -a $uvTools_rotate";
+					setParent ..;
+				setParent ..;
+			setParent ..;
+			frameLayout -label "UV Moving";
+				columnLayout;
+				floatFieldGrp -label "Moving Distance:"
+					-nf 2 -pre 3 -cw3 150 60 60
+					-v1 $uvTools_movingDistanceU
+					-v2 $uvTools_movingDistanceV
+					-cc "$uvTools_movingDistanceU = `floatFieldGrp -q -v1 movingDistance`;$uvTools_movingDistanceV = `floatFieldGrp -q -v2 movingDistance`" "movingDistance";
+
+					gridLayout -numberOfColumns 3 -cellWidthHeight 90 90 "_movebutton";
+					button -l "Left UP" -c "polyEditUV -u (-$uvTools_movingDistanceU) -v $uvTools_movingDistanceV";
+					button -l "Up" -c "polyEditUV -u 0 -v $uvTools_movingDistanceV";
+					button -l "Right UP" -c "polyEditUV -u $uvTools_movingDistanceU -v $uvTools_movingDistanceV";
+					button -l "Left" -c "polyEditUV -u (-$uvTools_movingDistanceU) -v 0";
+					button -l "V = U" -c "floatFieldGrp -e -v2 `floatFieldGrp -q -v1 movingDistance` movingDistance;$uvTools_movingDistanceV = $uvTools_movingDistanceU";
+					button -l "Right" -c "polyEditUV -u $uvTools_movingDistanceU -v 0";
+					button -l "Left Down" -c "polyEditUV -u (-$uvTools_movingDistanceU) -v (-$uvTools_movingDistanceV)";
+					button -l "Down" -c "polyEditUV -u 0 -v (-$uvTools_movingDistanceV)";
+					button -l "Right Down" -c "polyEditUV -u $uvTools_movingDistanceU -v (-$uvTools_movingDistanceV)";
+					setParent ..;
+				setParent ..;
+			setParent ..;
+		setParent ..;
+
+ 		string $tab2 = `columnLayout`;
+			rowLayout -nc 2 -cw2 220 50 -ct2 "both" "both";
+				floatFieldGrp -label "Align Taget:"
+					-nf 2 -pre 3 -cw3 100 50 50
+					-v1 $uvTools_alignTagetU
+					-v2 $uvTools_alignTagetV
+					-cc "$uvTools_alignTagetU = `floatFieldGrp -q -v1 alignTaget`;$uvTools_alignTagetV = `floatFieldGrp -q -v2 alignTaget`" "alignTaget";
+				button -l "pick" -c "vector $pickBounding[] = getUVsBounding();vector $pickCenter = $pickBounding[2];$uvTools_alignTagetU = $pickCenter.x;$uvTools_alignTagetV = $pickCenter.y;floatFieldGrp -e -v1 ($pickCenter.x) -v2 ($pickCenter.y) alignTaget";
+			setParent ..;
+			rowLayout -nc 2 -cw2 220 50 -ct2 "both" "both";
+				floatFieldGrp -label "Align Source:"
+					-nf 2 -pre 3 -cw3 100 50 50
+					-v1 $uvTools_alignSourceU
+					-v2 $uvTools_alignSourceV
+					-cc "$uvTools_alignSourceU = `floatFieldGrp -q -v1 alignSource`;$uvTools_alignSourceV = `floatFieldGrp -q -v2 alignSource`" "alignSource";
+				button -l "pick" -c "vector $pickBounding[] = getUVsBounding();vector $pickCenter = $pickBounding[2];$uvTools_alignSourceU = $pickCenter.x;$uvTools_alignSourceV = $pickCenter.y;floatFieldGrp -e -v1 ($pickCenter.x) -v2 ($pickCenter.y) alignSource";
+			setParent ..;
+			rowLayout -nc 1 -cw1 270 -ct1 "both";
+				button -l "Align" -c "polyEditUV -u ($uvTools_alignTagetU-$uvTools_alignSourceU) -v ($uvTools_alignTagetV-$uvTools_alignSourceV)";
+			setParent ..;
+			gridLayout -numberOfColumns 3 -cellWidthHeight 90 90 "_movebutton";
+			button -l "Left UP"	-c "uvBoundingAlign($uvTools_alignTagetU, $uvTools_alignTagetV, 6)";
+			button -l "Up"		-c "uvBoundingAlign($uvTools_alignTagetU, $uvTools_alignTagetV, 7)";
+			button -l "Right UP"	-c "uvBoundingAlign($uvTools_alignTagetU, $uvTools_alignTagetV, 8)";
+			button -l "Left"	-c "uvBoundingAlign($uvTools_alignTagetU, $uvTools_alignTagetV, 4)";
+			button -l "Center"	-c "uvBoundingAlign($uvTools_alignTagetU, $uvTools_alignTagetV, 0)";
+			button -l "Right"	-c "uvBoundingAlign($uvTools_alignTagetU, $uvTools_alignTagetV, 5)";
+			button -l "Left Down"	-c "uvBoundingAlign($uvTools_alignTagetU, $uvTools_alignTagetV, 1)";
+			button -l "Down"	-c "uvBoundingAlign($uvTools_alignTagetU, $uvTools_alignTagetV, 2)";
+			button -l "Right Down"	-c "uvBoundingAlign($uvTools_alignTagetU, $uvTools_alignTagetV, 3)";
+			setParent ..;
+		setParent ..;
+/*
+ 		string $tab2 = `columnLayout`;
+			rowLayout -nc 2 -cw2 200 70 -ct2 "both" "both";
+				columnLayout;
+				floatFieldGrp -label "Align Aim:"
+					-nf 2 -pre 3 -cw3 80 60 60
+					-v1 $uvTools_alignTagetU
+					-v2 $uvTools_alignTagetV
+					-cc "$uvTools_alignTagetU = `floatFieldGrp -q -v1 alignTaget`;$uvTools_alignTagetV = `floatFieldGrp -q -v2 alignTaget`" "alignTaget";
+				setParent ..;
+				columnLayout;
+				button -l "pick" -c "vector $pickBounding[] = getUVsBounding();vector $pickCenter = $pickBounding[2];$uvTools_alignTagetU = $pickCenter.x;$uvTools_alignTagetV = $pickCenter.y;floatFieldGrp -e -v1 ($pickCenter.x) -v2 ($pickCenter.y) alignTaget";
+				setParent ..;
+			setParent ..;
+			gridLayout -numberOfColumns 3 -cellWidthHeight 90 90 "_movebutton";
+			button -l "Left UP"	-c "uvBoundingAlign($uvTools_alignTagetU, $uvTools_alignTagetV, 6)";
+			button -l "Up"		-c "uvBoundingAlign($uvTools_alignTagetU, $uvTools_alignTagetV, 7)";
+			button -l "Right UP"	-c "uvBoundingAlign($uvTools_alignTagetU, $uvTools_alignTagetV, 8)";
+			button -l "Left"	-c "uvBoundingAlign($uvTools_alignTagetU, $uvTools_alignTagetV, 4)";
+			button -l "Center"	-c "uvBoundingAlign($uvTools_alignTagetU, $uvTools_alignTagetV, 0)";
+			button -l "Right"	-c "uvBoundingAlign($uvTools_alignTagetU, $uvTools_alignTagetV, 5)";
+			button -l "Left Down"	-c "uvBoundingAlign($uvTools_alignTagetU, $uvTools_alignTagetV, 1)";
+			button -l "Down"	-c "uvBoundingAlign($uvTools_alignTagetU, $uvTools_alignTagetV, 2)";
+			button -l "Right Down"	-c "uvBoundingAlign($uvTools_alignTagetU, $uvTools_alignTagetV, 3)";
+			setParent ..;
+		setParent ..;
+*/
+		tabLayout -edit
+ 			-tabLabel $tab1 "UV Move" -tabLabel $tab2 "UV Bounding Align"
+ 			$tabs;
+
+ 	showWindow uvToolsWindow;
+}
+
+//About//////////////
+global proc XXToolsAbout()
+{
+window -t "About XXTools..." -s false -tb false -rtf true "XXToolsAboutWindow";
+	columnLayout -cal "center" -cat "both" 0 -bgc 0.4 0.4 0.2 -cw 200;
+	text -l "XX Tools[R] Version 8.12.15" -fn "boldLabelFont" -bgc 1 1 0.3;
+	text -l "chirp" -bgc 0.8 0.9 0.2;
+	text -l "All right reserved." -bgc 0.5 0.8 0.1;
+	text -l "" -bgc 0.8 0.9 0.2;
+	button -l "OK" -w 50 -c "deleteUI XXToolsAboutWindow" -al "center" -bgc 0.2 0.7 0;
+showWindow XXToolsAboutWindow;
+}
+
+//UVMove//////////////
+
+global proc orderByDistanceOpi()
+{
+if(`window -ex "orderByDistanceWindow"`)deleteUI orderByDistanceWindow;
+//create UI
+window -t "Order By Distance" -s false -rtf true "orderByDistanceWindow";
+	columnLayout -adj on;
+	rowLayout -nc 5 -cw5 80 80 80 80 80 -cl5 "center" "center" "center" "center" "center";
+		text -l "";text -l "X";text -l "Y";text -l "Z";text -l "";
+		setParent ..;
+		rowLayout -nc 2 -cw2 320 80;
+		floatFieldGrp -nf 3 -l "Order Point" -cw4 80 80 80 80 -v1 0 -v2 0 -v3 0 "_refer";
+		button -l "Order" -c "orderByDistance(`floatFieldGrp -q -v \"_refer\"`,`checkBox -q -v \"_ord\"`)";
+		setParent ..;
+		rowLayout -nc 1 -ct1 "left" -co1 80;
+		checkBox -l "Positive" -v on "_ord";
+		setParent ..;
+		button -l "Close" -c "deleteUI orderByDistanceWindow";
+
+	showWindow orderByDistanceWindow;
+}
+
+//Vertex Color HSV///////
+global proc vtxColorHsvUi()
+{
+if(`window -ex "vtxColorHsvWindow"`)deleteUI vtxColorHsvWindow;
+window -title "Vertex Color HSV" vtxColorHsvWindow;
+	columnLayout;
+	floatSliderGrp -label "H" -field true
+		-minValue -180.0 -maxValue 180.0
+		-fieldMinValue -180.0 -fieldMaxValue 180.0
+		-value 0 "_H";
+	floatSliderGrp -label "S" -field true
+		-minValue -100 -maxValue 100
+		-fieldMinValue -100.0 -fieldMaxValue 100.0
+		-value 0 "_S";
+	floatSliderGrp -label "V" -field true
+		-minValue -100 -maxValue 100
+		-fieldMinValue -100.0 -fieldMaxValue 100.0
+		-value 0 "_V";
+	button -label "ok" -c "vtxColorHsv <<float(`floatSliderGrp -q -v \"_H\"`), float(`floatSliderGrp -q -v \"_S\"`), float(`floatSliderGrp -q -v \"_V\"`)>>";
+showWindow vtxColorHsvWindow;
+}
+
+global proc vtxColorLevelUi()
+{
+if(`window -ex "vtxColorLevelWindow"`)deleteUI vtxColorLevelWindow;
+window -title "Vertex Color Level" vtxColorLevelWindow;
+	columnLayout;
+	rowLayout -nc 2 -cw2 70 70 -ct2 "both" "both";
+
+	columnLayout -cal "center" -cat "both" 0;
+	text -l "input";
+	floatField -v 1 "_inputMax";
+	floatSlider2 -w 70 "_input";
+	floatField -v 0 "_inputMin";
+	setParent ..;
+
+	columnLayout -cal "center" -cat "both" 0;
+	text -l "output";
+	floatField -v 1 "_outputMax";
+	floatSlider2 -w 70 "_output";
+	floatField -v 0 "_outputMin";
+	setParent ..;
+
+	setParent ..;
+
+	rowLayout -nc 2 -cw2 70 70 -ct2 "both" "both";
+	button -l "ok" -al "center" "_ok";
+	button -l "reset" -al "center" "_reset";
+
+	floatSlider2 -edit -polarity 0 -min 0 -max 1 -vs 0 1 "_input";
+	floatSlider2 -edit -positionControl1 "_inputMin" -positionControl2 "_inputMax" "_input";
+	floatSlider2 -edit -polarity 0 -min 0 -max 1 -vs 0 1 "_output";
+	floatSlider2 -edit -positionControl1 "_outputMin" -positionControl2 "_outputMax" "_output";
+
+	button -edit -c "vtxColorLevel(`floatField -q -v \"_inputMin\"`,`floatField -q -v \"_inputMax\"`,`floatField -q -v \"_outputMin\"`,`floatField -q -v \"_outputMax\"`)" "_ok";
+
+	showWindow;
+}
+
+global proc closeAllWindows()
+{
+$UI =  `lsUI -windows`;
+deleteUI(stringArrayRemoveExact({"ColorEditor","CommandWindow","MayaWindow"}, $UI));
+}
+
+//◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆
+//◆◆◆◆   arithmetic   ◆◆◆◆
+//◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆
+
+//########################################################################--------------数学算法开始
+//两数组各项相加
+global proc float[] arrayPlus(float $a[], float $b[])
+{
+$size = size($a);
+float $result[];
+for($i=0;$i<$size;$i++){$result[$i] = $a[$i]+$b[$i];}
+return $result;
+}
+
+//两数组各项相乘
+global proc float[] arrayMultiply(float $a[], float $b)
+{
+$size = size($a);
+float $result[];
+for($i=0;$i<$size;$i++){$result[$i] = $a[$i]*$b;}
+return $result;
+}
+
+//???
+global proc float wrap(float $start, float $end, float $value)
+{
+float $result = (($value - $start)%($end - $start)+($end - $start))%($end - $start);
+return $result;
+}
+
+//输入输出变换(色阶)
+global proc float level(float $inMin, float $inMax, float $outMin, float $outMax, float $in)
+{
+float $p = linstep($inMin, $inMax, $in);
+float $out = ($outMax - $outMin) * $p + $outMin;
+return $out;
+}
+
+// 数组转换矩阵（矩阵）
+global proc matrix array2Matrix44(float $m[]){
+	matrix $result[4][4] = <<
+		$m[0],$m[1],$m[2],$m[3];
+		$m[4],$m[5],$m[6],$m[7];
+		$m[8],$m[9],$m[10],$m[11];
+		$m[12],$m[13],$m[14],$m[15]
+	>>;
+	return $result;
+}
+
+// 数组转换矩阵（矢量）
+global proc matrix array2Matrix14(float $p[]){
+	matrix $result[1][4] = <<$p[0], $p[1], $p[2], 1>>;
+	return $result;
+}
+
+//1*4同4*4矩阵相乘
+global proc matrix matrix14Multiply(matrix $a, matrix $b)
+{
+matrix $c[1][4];
+for($j=0;$j<4;$j++){
+	$c[0][$j] = $a[0][0]*$b[0][$j] + $a[0][1]*$b[1][$j] + $a[0][2]*$b[2][$j] + $a[0][3]*$b[3][$j];
+	}
+return $c;
+}
+
+//4*4同4*4矩阵相乘
+global proc matrix matrix44Multiply(matrix $a, matrix $b)
+{
+matrix $c[4][4];
+for($i=0;$i<4;$i++){
+	for($j=0;$j<4;$j++){
+		$c[$i][$j] = $a[$i][0]*$b[0][$j] + $a[$i][1]*$b[1][$j] + $a[$i][2]*$b[2][$j] + $a[$i][3]*$b[3][$j];
+		}
+	}
+return $c;
+}
+
+//向量转矩阵
+global proc matrix matrixVector(vector $v)
+{
+matrix $mv[1][4] = <<	($v.x),		($v.y),		($v.z),		1	>>;
+return $mv;
+}
+
+//位移变换矩阵
+global proc matrix matrixTranslation(vector $v)
+{
+matrix $mt[4][4] = <<	1,		0,		0,		0;
+			0,		1,		0,		0;
+			0,		0,		1,		0;
+			(-($v.x)),	(-($v.x)),	(-($v.x)),	1	>>;
+return $mt;
+}
+
+//X旋转变换矩阵
+global proc matrix matrixRotationX(float $angle)
+{
+matrix $mt[4][4] = <<	1,		0,		0,		0;
+			0,		cos($angle),	sin($angle),	0;
+			0,		(-sin($angle)),	cos($angle),	0;
+			0,		0,		0,		1	>>;
+return $mt;
+}
+
+//Y旋转变换矩阵
+global proc matrix matrixRotationY(float $angle)
+{
+matrix $mt[4][4] = <<	cos($angle),	0,		(-sin($angle)),	0;
+			0,		1,		0,		0;
+			sin($angle),	0,		cos($angle),	0;
+			0,		0,		0,		1	>>;
+return $mt;
+}
+
+//Z旋转变换矩阵
+global proc matrix matrixRotationZ(float $angle)
+{
+matrix $mt[4][4] = <<	cos($angle),	sin($angle),	0,		0;
+			(-sin($angle)),	cos($angle),	0,		0;
+			0,		0,		1,		0;
+			0,		0,		0,		1	>>;
+return $mt;
+}
+
+//缩放变换矩阵
+global proc matrix matrixScaling(vector $s)
+{
+matrix $mt[4][4] = <<	1/($s.x),	0,		0,		0;
+			0,		1/($s.y),	0,		0;
+			0,		0,		1/($s.z),	0;
+			0,		0,		0,		1	>>;
+return $mt;
+}
+
+//坐标系转换（位移）,o是位移值
+global proc vector transformTranslation(vector $v ,vector $o)
+{
+matrix $mv[1][4];
+$mv = matrixVector($v);
+matrix $mt[4][4];
+$mt = matrixTranslation($o);
+matrix $mn[1][4];
+$mn = matrix14Multiply($mv,$mt);
+vector $vn = <<$mn[0][0],$mn[0][1],$mn[0][2]>>;
+return $vn;
+}
+
+//坐标系转换（旋转）,o是旋转值
+global proc vector transformRotation(vector $v, vector $o)
+{
+matrix $mv[1][4];
+$mv = matrixVector($v);
+matrix $mrx[4][4], $mry[4][4], $mrz[4][4];
+$mrx = matrixRotationX($o.x);
+$mry = matrixRotationY($o.y);
+$mrz = matrixRotationZ($o.z);
+matrix $mn[1][4];
+$mn = matrix14Multiply($mv, $mrx);
+$mn = matrix14Multiply($mn, $mry);
+$mn = matrix14Multiply($mn, $mrz);
+vector $vn = <<$mn[0][0],$mn[0][1],$mn[0][2]>>;
+return $vn;
+}
+
+//坐标系转换（缩放）,o是缩放值
+global proc vector transformScaling(vector $v, vector $o)
+{
+matrix $mv[1][4];
+$mv = matrixVector($v);
+matrix $ms[4][4];
+$ms = matrixScaling($o);
+matrix $mn[1][4];
+$mn = matrix14Multiply($mv,$ms);
+vector $vn = <<$mn[0][0],$mn[0][1],$mn[0][2]>>;
+return $vn;
+}
+
+//坐标系转换（位移，旋转，缩放）,v原坐标，t目标坐标系原点的位移，r目标坐标系旋转度数，s目标坐标系的缩放
+global proc vector transformAll(vector $v, vector $t, vector $r, vector $s)
+{
+matrix $mv[1][4];
+$mv = matrixVector($v);
+matrix $ms[4][4];
+$ms = matrixScaling($s);
+matrix $mt[4][4];
+$mt = matrixTranslation($t);
+matrix $mrx[4][4], $mry[4][4], $mrz[4][4];
+$mrx = matrixRotationX($r.x);
+$mry = matrixRotationY($r.y);
+$mrz = matrixRotationZ($r.z);
+matrix $mn[1][4];
+$mn = matrix14Multiply($mv, $ms);
+$mn = matrix14Multiply($mv, $mrx);
+$mn = matrix14Multiply($mn, $mry);
+$mn = matrix14Multiply($mn, $mrz);
+$mn = matrix14Multiply($mn, $mt);
+vector $vn = <<$mn[0][0],$mn[0][1],$mn[0][2]>>;
+return $vn;
+}
+
+//向量标准化。
+global proc vector normalizeV(vector $v)
+{
+float $m = mag($v);
+return <<($v.x)/$m,($v.y)/$m,($v.z)/$m>>;
+}
+
+//获得摄影机坐标系三轴标准化向量组。
+global proc vector[] lookAtAxis(vector $eye, vector $at, vector $up)
+{
+vector $axis[3];
+$axis[2]=normalizeV($at-$eye);
+$axis[0]=normalizeV(cross($up, $axis[2]));
+$axis[1]=normalizeV(cross($axis[2],$axis[0]));
+return $axis;
+}
+
+//获得摄影机坐标系转换矩阵。
+global proc matrix matrixLookAt(vector $eye, vector $at, vector $up)
+{
+vector $axis[]=lookAtAxis($eye, $at, $up);
+vector $xaxis = $axis[0];
+vector $yaxis = $axis[1];
+vector $zaxis = $axis[2];
+matrix $mt[4][4] = <<	($xaxis.x),		($yaxis.x),		($zaxis.x),		0;
+			($xaxis.y),		($yaxis.y),		($zaxis.y),		0;
+			($xaxis.z),		($yaxis.z),		($zaxis.z),		0;
+			-dot($xaxis,$eye),	-dot($yaxis,$eye),	-dot($zaxis,$eye),	1	>>;
+return $mt;
+}
+
+//转换世界坐标为摄影机坐标，观察点eye,目标at，上方向量up, 目标点v。
+global proc vector transformLookAt(vector $eye, vector $at, vector $up, vector $v)
+{
+matrix $mv[1][4];
+$mv = matrixVector($v);
+matrix $mla[4][4];
+$mla = matrixLookAt($eye, $at, $up);
+matrix $mn[1][4];
+$mn = matrix14Multiply($mv,$mla);
+vector $vn = <<$mn[0][0],$mn[0][1],$mn[0][2]>>;
+return $vn;
+}
+
+/*
+直线与平面相交算法,直线用向量和线上一点确定,平面用法向量和面上一点确定。交点的分量算法如下：
+x = ( (bv+cw)x0 - u(by0+cz0+d) )/au+bv+cw
+y = ( (au+cw)y0 - v(ax0+cz0+d) )/au+bv+cw
+z = ( (au+bv)z0 - w(ax0+by0+d) )/au+bv+cw
+明晰算法如下:
+global proc vector pointOfPlaneIntersectLine(vector $np, vector $pp, vector $nl, vector $pl)	//np is normal of plane;  pp is point in plane;  nl is normal of line;  pl is point in line
+{
+//plane Define
+float $a = ($np.x);
+float $b = ($np.y);
+float $c = ($np.z);
+float $d = -(($np.x)*($pp.x)+($np.y)*($pp.y)+($np.z)*($pp.z));
+//line Define
+float $u = ($nl.x);
+float $v = ($nl.y);
+float $w = ($nl.z);
+float $div = ($a*$u+$b*$v+$c*$w);
+float $x = (($b*$v+$c*$w)*($pl.x)-$u*($b*($pl.y)+$c*($pl.z)+$d))/$div;
+float $y = (($a*$u+$c*$w)*($pl.y)-$v*($a*($pl.x)+$c*($pl.z)+$d))/$div;
+float $z = (($a*$u+$b*$v)*($pl.z)-$w*($a*($pl.x)+$b*($pl.y)+$d))/$div;
+return <<$x,$y,$z>>;
+}
+*/
+//简化算法
+global proc vector pointOfPlaneIntersectLine(vector $np, vector $pp, vector $nl, vector $pl)	//np为平面法向量;  pp为平面上一点;  nl为直线向量;  pl为直线上一点
+{
+float $d = -(($np.x)*($pp.x)+($np.y)*($pp.y)+($np.z)*($pp.z));
+float $div = (($np.x)*($nl.x)+($np.y)*($nl.y)+($np.z)*($nl.z));
+float $x = ((($np.y)*($nl.y)+($np.z)*($nl.z))*($pl.x)-($nl.x)*(($np.y)*($pl.y)+($np.z)*($pl.z)+$d))/$div;
+float $y = ((($np.x)*($nl.x)+($np.z)*($nl.z))*($pl.y)-($nl.y)*(($np.x)*($pl.x)+($np.z)*($pl.z)+$d))/$div;
+float $z = ((($np.x)*($nl.x)+($np.y)*($nl.y))*($pl.z)-($nl.z)*(($np.x)*($pl.x)+($np.y)*($pl.y)+$d))/$div;
+return <<$x,$y,$z>>;
+}
+
+////////////////////////////////////////////////
+
+//向量组一一对应相加
+global proc vector[] vectorArrayPlus(vector $a[], vector $b[])
+{
+int $size = min(size($a),size($b));
+vector $c[];
+for($i=0;$i<$size;$i++){
+	$c[$i] = $a[$i] + $b[$i];
+	}
+return $c;
+}
+
+//向量组与实数相乘
+global proc vector[] vectorArrayMulti(vector $a[], float $b)
+{
+int $size = size($a);
+vector $c[];
+for($i=0;$i<$size;$i++){
+	$c[$i] = $a[$i] * $b;
+	}
+return $c;
+}
+
+//取得选中物体的点的vrt向量
+global proc vector[] getVrts(string $vtxes[])
+{
+int $size = size($vtxes);
+vector $vecVrts[];
+for($i=0;$i<$size;$i++){
+	string $vrtName = substituteAllString($vtxes[$i],"vtx","vrts");
+	$vecVrts[$i] = getAttr($vrtName);
+	}
+return $vecVrts;
+}
+
+//取得选中物体的点的pnt向量
+global proc vector[] getPnts(string $vtxes[])
+{
+int $size = size($vtxes);
+vector $vecPnts[];
+for($i=0;$i<$size;$i++){
+	string $vrtName = substituteAllString($vtxes[$i],"vtx","pnts");
+	$vecPnts[$i] = getAttr($vrtName);
+	}
+return $vecPnts;
+}
+
+//取得选中物体的点的位移向量（向量组，物体坐标系）
+global proc vector[] getVectorsVtx(string $obj)
+{
+string $vtxes[] = ls("-fl", polyListComponentConversion("-tv",$obj));
+int $size = size($vtxes);
+vector $vecVtxes[];
+for($i=0;$i<$size;$i++){
+	string $vrtName = substituteAllString($vtxes[$i],"vtx","vrts");
+	string $pntName = substituteAllString($vtxes[$i],"vtx","pnts");
+	vector $vrt = getAttr($vrtName);
+	vector $pnt = getAttr($pntName);
+	$vecVtxes[$i] = $vrt + $pnt;
+	}
+return $vecVtxes;
+}
+
+//取得面的法线向量
+global proc vector getFaceNormal(string $face)
+{
+string $faceNormalInfo[] = polyInfo("-fn",$face);
+string $faceNormalArray[] = stringToStringArray($faceNormalInfo[0]," ");
+vector $faceNormalVector = <<(float)$faceNormalArray[2],(float)$faceNormalArray[3],(float)$faceNormalArray[4]>>;
+return $faceNormalVector;
+}
+
+//取得选中物体的面所属点面的法线向量（向量组，物体坐标系）
+global proc vector[] getNormalVtxface(string $obj)
+{
+string $selFace[] = `filterExpand -sm 34 -fp 1 $obj`;
+string $selVtx[] = `polyListComponentConversion -ff -tvf $selFace[0]`;
+string $vtxes[] = `ls -fl $selVtx`;
+int $size = size($vtxes);
+vector $normalVtxes[];
+for($i=0;$i<$size;$i++){
+	float $normal[] = `polyNormalPerVertex -q -xyz $vtxes[$i]`;
+	$normalVtxes[$i] = <<$normal[0],$normal[1],$normal[2]>>;
+	}
+return $normalVtxes;
+}
+
+//向量数组的向量和
+global proc vector sumVectors(vector $vs[])
+{
+int $s = size($vs);
+vector $sumV;
+for($i=0;$i<$s;$i++)$sumV += $vs[$i];
+return $sumV;
+}
+
+//求点群所占空间的最小位置
+global proc vector minVector(vector $vs[])
+{
+vector $v = $vs[0];
+float $minX=($v.x), $minY=($v.y), $minZ=($v.z);
+for($v in $vs){
+	$minX=min(($v.x),$minX);
+	$minY=min(($v.y),$minY);
+	$minZ=min(($v.z),$minZ);
+
+	}
+return <<$minX,$minY,$minZ>>;
+}
+
+//求点群所占空间的最大位置
+global proc vector maxVector(vector $vs[])
+{
+vector $v = $vs[0];
+float $maxX=($v.x), $maxY=($v.y), $maxZ=($v.z);
+for($v in $vs){
+	$maxX=max(($v.x),$maxX);
+	$maxY=max(($v.y),$maxY);
+	$maxZ=max(($v.z),$maxZ);
+	}
+return <<$maxX,$maxY,$maxZ>>;
+}
+
+//求两个向量的中点
+global proc vector centerVectors(vector $min, vector $max)
+{
+vector $mV = $min + $max;
+return  <<($mV.x)/2, ($mV.y)/2, ($mV.z)/2>>;
+}
+
+//向量数组的平均值
+global proc vector averageVectors(vector $v[])
+{
+int $size = size($v);
+vector $mV = sumVectors($v);
+return <<($mV.x)/$size, ($mV.y)/$size, ($mV.z)/$size>>;
+}
+//########################################################################--------------数学算法结束
+
+//########################################################################--------------字符串算法开始
+//给字符串数组各项添加后缀
+global proc string[] stringArraySuffix(string $ori[],string $suf)
+{
+int $size = size($ori);
+string $res[];
+for($i=0;$i<$size;$i++){
+	$res[$i] = $ori[$i] + $suf;
+	}
+return $res;
+}
+
+//取得"[id]"中的"id"
+global proc string componentId(string $sel)
+{
+string $id[];
+tokenize $sel "[]" $id;
+return $id[1];
+}
+
+//取得文件路径中的文件名
+global proc string filename(string $fullpath)
+{
+string $tokenize[];
+tokenize $fullpath "/" $tokenize;
+return $tokenize[size($tokenize)-1];
+}
+
+//去除namespace
+global proc string withoutNamespace(string $name)
+{
+string $buf[];
+tokenize $name ":" $buf;
+return $buf[size($buf)-1];
+}
+
+//获取序列号,place为序列基本长度
+global proc string serialCode(int $count, int $place)
+{
+$sizeCount = size(string($count));
+if($sizeCount<$place)
+	{
+	$zeroCount = $place - $sizeCount;
+	$zeroStr="";
+	for($i=0;$i<$zeroCount;$i++)$zeroStr+="0";
+//	$zeroStr = endString(string(pow(10,$zeroCount)),$zeroCount);
+	return $zeroStr+$count;
+	}
+else return string($count);
+}
+
+//在字符数组中查找字符串返回索引号，失败返回-1
+global proc int findStringWithinArray(string $str, string $arr[])
+{
+	int $s = size($arr);
+	for($i=0;$i<$s;$i++){
+		if($arr[$i]==$str)return($i);
+	}
+	return(-1);
+}
+
+//取得面的点ID序列
+global proc string[] vtxIDFace(string $face)
+{
+	string $pInfoStr[] = `polyInfo -fv $face`;
+	string $buffer[];
+	tokenize($pInfoStr[0],":",$buffer);
+	string $ID[] = stringToStringArray($buffer[1]," \n");
+	return $ID;
+}
+
+//取得面的边ID序列
+global proc string[] edgeIDFace(string $face)
+{
+	string $pInfoStr[] = `polyInfo -fe $face`;
+	string $buffer[];
+	tokenize($pInfoStr[0],":",$buffer);
+	string $ID[] = stringToStringArray($buffer[1]," \n");
+	return $ID;
+}
+
+//多边形边数
+global proc int polyEdgeAmount(string $face){
+	$withEdge = polyInfo("-fe",$face);
+	return size(stringToStringArray($withEdge[0]," ")) - 3;
+}
+
+//非四边形面
+global proc string[] notQuadFaces(){
+$selFaces = filterExpand("-ex",1,"-sm",34,polyListComponentConversion("-tf"));
+string $notQuadFaces[];
+for($selFace in $selFaces){
+	if(polyEdgeAmount($selFace)!=4) $notQuadFaces[size($notQuadFaces)]=$selFace;
+}
+return $notQuadFaces;
+}
+//########################################################################--------------字符串算法结束
+
+//########################################################################--------------UV算法开始
+//取得所选UV点的最大最小位置及中心位置
+global proc vector[] getUVsBounding()
+{
+vector $UVs[];
+$maps = filterExpand("-sm",35);
+int $size=size($maps);
+for($i=0;$i<$size;$i++){
+	float $UV[]=getAttr(substituteAllString($maps[$i],".map",".uv"));
+	$UVs[$i]=<< $UV[0], $UV[1], 0 >>;
+	}
+vector $bounding[3];
+$bounding[0] = minVector($UVs);
+$bounding[1] = maxVector($UVs);
+$bounding[2] = centerVectors($bounding[0], $bounding[1]);
+return $bounding;
+}
+
+//取得所选物体的顶点镜像分组
+global proc string[] vtxMirrorGroup(float $tolerance,string $mesh)
+{
+if (objectType($mesh)!="mesh"){
+	print("Error: "+$mesh+" is not \"mesh\".");
+	return {};
+	}
+string $vtxes[] = ls("-fl", polyListComponentConversion("-tv",$mesh));
+string $vtxGroupL[],$vtxGroupT[],$vtxGroupR[],$vtxGroupM[],$vtxGroupD[];
+vector $vtxVectorL[],$vtxVectorT[],$vtxVectorR[];
+int $falseFlag;
+int $size = size($vtxes);
+for($i=0;$i<$size;$i++){
+	string $vrtName = substituteAllString($vtxes[$i],"vtx","vrts");
+	string $pntName = substituteAllString($vtxes[$i],"vtx","pnts");
+	string $buffer[];
+	tokenize $vtxes[$i] "." $buffer;
+	string $vtxStr	= $buffer[1];
+	vector $vrt = getAttr($vrtName);
+	vector $pnt = getAttr($pntName);
+	vector $vtx = $vrt + $pnt;
+//	$vtxVector[$i] = $vtx;
+	if ($vtx.x<-$tolerance){
+		$vtxGroupL[size($vtxGroupL)] = $vtxStr;
+		$vtxVectorL[size($vtxVectorL)] = $vtx;
+		}
+	else if ($vtx.x>$tolerance){
+		$vtxGroupT[size($vtxGroupT)] = $vtxStr;
+		$vtxVectorT[size($vtxVectorT)] = $vtx;
+		}
+	else $vtxGroupM[size($vtxGroupM)] = $vtxStr;
+	}//左中右分组完毕，定点名称与定点矢量数组排列一一对应
+$sizeL = size($vtxVectorL);
+$sizeT = size($vtxVectorT);
+for($i=0;$i<$sizeL;$i++){
+	vector $vtxL = $vtxVectorL[$i];
+	$falseFlag = 1;
+	for($j=0;$j<$sizeT;$j++){
+		vector $vtxT = $vtxVectorT[$j];
+		if((abs($vtxL.x+$vtxT.x)<$tolerance)&&(abs($vtxL.y-$vtxT.y)<$tolerance)&&(abs($vtxL.z-$vtxT.z)<$tolerance)){
+			$vtxGroupR[$i] = $vtxGroupT[$j];
+			$falseFlag = 0;
+			break;
+			}
+		}
+	if($falseFlag){
+		$vtxGroupR[$i] = "";
+		$vtxGroupD[size($vtxGroupD)] = $vtxGroupL[$i];
+		}
+	}
+string $vtxMG[4];
+$vtxMG[0] = stringArrayToString($vtxGroupL,"|");
+$vtxMG[1] = stringArrayToString($vtxGroupR,"|");
+$vtxMG[2] = stringArrayToString($vtxGroupM,"|");
+$vtxMG[3] = stringArrayToString($vtxGroupD,"|");
+return $vtxMG;
+}
+//########################################################################--------------UV算法结束
+
+//◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆
+//◆◆◆◆   selection    ◆◆◆◆
+//◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆
+
+//选择第一个被选中的对象
+global proc string firstSelected()
+{
+$sel=`ls -sl`;
+return $sel[0];
+}
+
+//选择第一个被选中的物体
+global proc string firstSelectedMesh()
+{
+$sel=ls("-g",ls("-sl","-dag"));
+return $sel[0];
+}
+
+//选择选择集$objs中以指定字符串$satrtStr开头的对象
+global proc selectStartsWith(string $objs[],string $startStr)
+{
+string $gsel[];
+for($obj in $objs)	{
+	if(startsWith($obj,$startStr))$gsel[size($gsel)]=$obj;
+	}
+select $gsel;
+}
+
+//◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆
+//◆◆◆◆   Attribute    ◆◆◆◆
+//◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆
+
+//批量关掉物体的双面显示属性
+global proc multiSingleSided()
+{
+
+string $selection[] = `ls -sl -fl`;
+
+for ( $sel in $selection )
+	{
+	string $obj = $sel+".doubleSided";
+	setAttr $obj 0;
+	}
+}
+
+//重置所选择的transform节点的坐标系原点到轴心(物体中心回到轴心位置)
+global proc ResetToPivot()
+{
+$sel = `ls -sl`;
+for($obj in $sel)
+	{
+	$type = `objectType $obj`;
+	if($type!="transform")continue;
+
+	$translate = `getAttr ($obj + ".translate")`;
+	$rp = `getAttr ($obj + ".rotatePivot")`;
+	$rpt = `getAttr ($obj + ".rotatePivotTranslate")`;
+
+	float $trans[];
+
+	$trans = arrayPlus(arrayPlus($translate,$rp),$rpt);
+
+	setAttr ($obj + ".translate") -type "double3" $trans[0] $trans[1] $trans[2];
+	setAttr ($obj + ".rotatePivot") -type "double3" 0 0 0;
+	setAttr ($obj + ".rotatePivotTranslate") -type "double3" 0 0 0;
+	setAttr ($obj + ".scalePivot") -type "double3" 0 0 0;
+	setAttr ($obj + ".scalePivotTranslate") -type "double3" 0 0 0;
+	}
+}
+
+//批量设置所选对象的指定属性，可设置属性类型
+global proc batchSetAttr(string $attrName, float $value, string $strValue)
+{
+string $selection[] = `ls -sl -fl`;
+
+for ( $sel in $selection )
+	{
+	string $obj = $sel + "." + $attrName;
+	if($strValue=="")setAttr $obj $value;
+	else setAttr $obj -type "string" $strValue;
+	}
+}
+
+//批量设置所选对象的指定属性，固定字符串属性
+global proc batchAttrWrite(string $attr, string $value)
+{
+string $selection[] = `ls -sl -fl`;
+
+for ( $sel in $selection )
+	{
+	string $obj = $sel+$attr;
+	setAttr $obj $value;
+	}
+}
+
+//设置物体法线为正向
+global proc setNormalPositive(int $ReverseNormal)
+{
+
+//save option
+optionVar -iv "XXToolsSNOReverse" $ReverseNormal;
+
+string $selection[] = `ls -sl -fl`;
+
+for ( $sel in $selection )
+	{
+	string $obj = $sel+".opposite";
+	if(`getAttr $obj`)
+		{
+		setAttr $obj 0;
+		if ($ReverseNormal)polyNormal -nm 0 $sel;
+		}
+	}
+}
+
+//添加定点镜像信息属性
+global proc vtxMirrorInfo(string $mesh)
+{
+if(!attributeExists("vtxMirrorXInfo", $mesh))addAttr -ln "vtxMirrorXInfo" -dt stringArray $mesh;
+$mg = vtxMirrorGroup(`tolerance -q -l`, $mesh);
+setAttr ($mesh+".vtxMirrorXInfo") -type "stringArray" 2 $mg[0] $mg[1];
+}
+
+//◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆
+//◆◆◆◆      Node      ◆◆◆◆
+//◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆
+//
+//global proc string[] searchFileNode(string $nodeList[])
+//{
+//if (size($nodeList)==0) return $nodeList;
+//string $fileNode[], $otherNode[];
+//for($node in $nodeList)
+//	{
+//	$sourceNodes =stringArrayRemoveDuplicates(`listConnections -s on -d off $node`);
+//	for($n in $sourceNodes)
+//		{
+//		if(nodeType($n)=="file") $fileNode[size($fileNode)] = $n;
+//		else $otherNode[size($otherNode)] = $n;
+//		}
+//	$nextSearch = searchFileNode($otherNode);
+//	appendStringArray($fileNode, $nextSearch, size($nextSearch));
+//	}
+//return $fileNode;
+//}
+
+//查找源节点
+global proc string[] searchSourceNodes(string $nodeName)
+{
+if(size($nodeName)==0)return {""};
+string $nodeList[];
+$sourceNodes = stringArrayRemoveDuplicates(`listConnections -s on -d off $nodeName`);
+appendStringArray($nodeList, $sourceNodes, size($sourceNodes));
+for($node in $sourceNodes)
+	{
+	$nextSearch = searchSourceNodes($node);
+	appendStringArray($nodeList, $nextSearch, size($nextSearch));
+	}
+return $nodeList;
+}
+
+//查找目标节点
+global proc string[] searchDestinationNodes(string $nodeName)
+{
+if(size($nodeName)==0)return {""};
+string $nodeList[];
+$destinationNodes = stringArrayRemoveDuplicates(`listConnections -s off -d on $nodeName`);
+appendStringArray($nodeList, $destinationNodes, size($destinationNodes));
+for($node in $destinationNodes)
+	{
+	$nextSearch = searchDestinationNodes($node);
+	appendStringArray($nodeList, $nextSearch, size($nextSearch));
+	}
+return $nodeList;
+}
+
+//寻找输入源中最近层级的file节点
+global proc string[] searchLastFileNodes(string $nodeName)
+{
+if(size($nodeName)==0)return {""};
+string $nodeList[];
+$sourceNodes = stringArrayRemoveDuplicates(`listConnections -s on -d off $nodeName`);
+$fileNodes = `ls -type "file" $sourceNodes`;
+if(size($fileNodes)>0)return $fileNodes;
+for($node in $sourceNodes)
+	{
+	$nextSearch = searchLastFileNodes($node);
+	$fileNodes = `ls -type "file" $nextSearch`;
+	appendStringArray($nodeList, $fileNodes, size($fileNodes));
+	}
+return $nodeList;
+}
+
+//寻找输入源中所有的file节点
+global proc string[] searchFileNodes(string $nodeList[])
+{
+if (size($nodeList)==0) return $nodeList;
+string $fileNode[];
+for($node in $nodeList)
+	{
+	$sourceNodes =  `ls -type "file" (searchSourceNodes($node))`;
+	appendStringArray($fileNode, $sourceNodes, size($sourceNodes));
+	}
+return $fileNode;
+}
+
+//列出节点的输入插头
+global proc string[] listSourcePlugs(string $node)
+{
+$sourceConn = `listConnections -d off -s on -c on $node`;
+string $sourcePlug[];
+for($i=0;$i<size($sourceConn);$i+=2)$sourcePlug[$i/2]=$sourceConn[$i];
+return $sourcePlug;
+}
+
+//列出节点的输出插头(清除重复)
+global proc string[] listDestinationPlugs(string $node)
+{
+$destinationConn = `listConnections -d on -s off -c on $node`;
+string $destinationPlug[];
+for($i=0;$i<size($destinationConn);$i+=2)$destinationPlug[$i/2]=$destinationConn[$i];
+return stringArrayRemoveDuplicates($destinationPlug);
+}
+
+//复制节电输入连接
+global proc copySourceConnections(string $source, string $destination)
+{
+$connections = `listConnections -s on -d off -c on -p on $source`;
+string $driver[], $driven[];
+for($i=0; $i<size($connections); $i+=2)
+	{
+	$driven[$i/2] = $connections[$i];
+	$driver[$i/2] = $connections[$i+1];
+	}
+for($i=0; $i<size($driver); $i++)
+	{
+	connectAttr -f $driver[$i] (substitute($source, $driven[$i], $destination));
+	}
+}
+
+//复制节点输出连接
+global proc copyDestinationConnections(string $source, string $destination)
+{
+$connections = `listConnections -s off -d on -c on -p on $source`;
+string $driver[], $driven[];
+for($i=0; $i<size($connections); $i+=2)
+	{
+	$driver[$i/2] = $connections[$i];
+	$driven[$i/2] = $connections[$i+1];
+	}
+for($i=0; $i<size($driven); $i++)
+	{
+	connectAttr -f (substitute($source, $driver[$i], $destination)) $driven[$i];
+	}
+}
+
+//复制节电输入连接(复制第一个到其他几个)
+global proc CSC()
+{
+$sel = `ls -sl`;
+for($i=1;$i<size($sel);$i++)copySourceConnections($sel[0],$sel[$i]);
+}
+
+//复制节点输出连接(复制第一个到其他几个)
+global proc CDC()
+{
+$sel = `ls -sl`;
+for($i=1;$i<size($sel);$i++)copyDestinationConnections($sel[0],$sel[$i]);
+}
+
+//删除未知节点
+global proc deleteUnknown()
+{
+$node = `ls -type "unknown"`;
+delete $node;
+print $node;
+print ("secuess deleted" + size($node) + "unknown node, look up Script Editor");
+}
+
+//◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆
+//◆◆◆◆     rename     ◆◆◆◆
+//◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆
+
+//批量序列重命名
+global proc serialRename(string $methed, string $baseName, int $place, int $from, int $pos)
+{
+if (!isValidObjectName($baseName))error("error!! >_<");
+$sel = `ls -sl`;
+$i = $from;
+for($obj in $sel)
+	{
+	$newName = $baseName + "x" + $i;
+	rename $obj $newName;
+	$i++;
+	}
+$sel = `ls -sl`;
+$i = $from;
+for($obj in $sel)
+	{
+	switch ($methed) {
+	   case "pre":
+ 	       $newName = "_" + serialCode($i, $place) + $baseName;
+ 	       break;
+ 	   case "suf":
+ 	       $newName = $baseName + serialCode($i, $place);
+ 	       break;
+ 	   case "ins":
+ 	       $newName = startString($baseName,$pos) + serialCode($i, $place) + endString($baseName,size($baseName)-$pos);
+ 	       break;
+	}
+	rename $obj $newName;
+	$i++;
+	}
+}
+
+//批量插入重命名
+global proc insertRename(int $insPos, string $insContent)
+{
+$sel = `ls -sl`;
+for($obj in $sel)
+	{
+	$newName = startString($obj,$insPos) + $insContent + endString($obj,size($obj)-$insPos);
+	rename $obj $newName;
+	}
+}
+
+//批量替换重命名
+global proc replaceRename(string $find, string $replace)
+{
+string $sel[] = `ls -sl`;
+for($obj in $sel){
+	string $buffer[];
+	tokenize($obj,"|",$buffer);
+	string $oldname = $buffer[size($buffer)-1];
+	string $newname = substituteAllString($oldname, $find, $replace);
+	print("\""+$obj+"\"--->\""+$newname+"\"\n");
+	rename $obj $newname;
+	}
+}
+
+//递归改名
+global proc RecursivelyReplaceRename(string $find, string $replace)
+{
+
+}
+
+//贴图材质重命名
+global proc texturenames(string $fileNodes[])
+{
+for($fileNode in $fileNodes)
+	{
+	texturename($fileNode);
+	}
+}
+
+global proc texturename(string $fileNode)
+{
+$type = `objectType $fileNode`;
+if($type!="file"&&$type!="psdFile")return;
+$att = $fileNode + ".fileTextureName";
+string $texturename = basenameEx(`getAttr $att`);
+rename $fileNode ("tex_" + $texturename);
+}
+
+global proc materialnames(string $materialNodes[])
+{
+for($materialNode in $materialNodes)
+	{
+	materialname($materialNode);
+	}
+}
+
+global proc materialname(string $materialNode)
+{
+$type = `objectType $materialNode`;
+if($type!="anisotropic"&&$type!="blinn"&&$type!="lambert"&&$type!="phong"&&$type!="phongE"&&$type!="surfaceShader")return;
+$fileNodes = `ls -type "file" (searchSourceNodes($materialNode))`;
+texturenames($fileNodes);
+$fileNodes = `ls -type "file" (searchSourceNodes($materialNode))`;
+if(size($fileNodes)>0)
+	{
+	string $fileNode = $fileNodes[0];
+	$materialname = substitute("tex_", $fileNode, "mat_");
+	rename $materialNode $materialname;
+	}
+}
+
+global proc string texTagName(string $fileNode)
+{
+$type = `objectType $fileNode`;
+if($type!="file"&&$type!="psdFileTex")return "";
+$fileOutTransparency = listConnections("-s", 0, "-d", 1, ($fileNode + ".outTransparency"));
+$place2dTextureNode = ls("-type", "place2dTexture", (stringArrayRemoveDuplicates(listConnections("-s", 1, "-d", 0, $fileNode))));
+int $place2dTextureMirror, $place2dTextureRepeatU, $place2dTextureRepeatV;
+string $place2dTextureAnimNode[] = {};
+if(size($place2dTextureNode))
+	{
+	$place2dTextureMirror = getAttr($place2dTextureNode[0]+".mirrorU")||getAttr($place2dTextureNode[0]+".mirrorU");
+	$place2dTextureRepeatU = getAttr($place2dTextureNode[0]+".repeatU");
+	$place2dTextureRepeatV = getAttr($place2dTextureNode[0]+".repeatV");
+	$place2dTextureAnimNode = ls("-type", "animCurveTU", (stringArrayRemoveDuplicates(listConnections("-s", 1, "-d", 0, $place2dTextureNode))));
+	}
+	else
+	{
+	$place2dTextureMirror = 0;
+	$place2dTextureRepeatU = 1;
+	$place2dTextureRepeatV = 1;
+	}
+string $tag=$place2dTextureRepeatU+"_"+$place2dTextureRepeatV+"_";
+if(size($fileOutTransparency))$tag+="A_";
+if(size($place2dTextureAnimNode))$tag+="M_";
+if($place2dTextureMirror)$tag+="m_";
+return $tag;
+}
+
+//批量指定贴图类型
+global proc textureType(string $textype)
+{
+$seltex = `ls -sl`;
+for($tex in $seltex)
+	{
+	$type = `objectType $tex`;
+	if($type!="file")continue;
+	$att = $tex + ".fileTextureName";
+	string $filepath[];
+	string $filename = `getAttr $att`;
+	tokenize($filename, ".", $filepath);
+	$filename = $filepath[0] + "." + $textype;
+	setAttr $att -type "string" $filename;
+	}
+}
+
+
+//批量指定贴图路径
+global proc texturePath(string $texpath)
+{
+$seltex = `ls -type "file" -sl`;
+for($tex in $seltex)
+	{
+	$att = $tex + ".fileTextureName";
+	string $newtexpath = $texpath + filename(`getAttr $att`);
+	setAttr $att -type "string" $newtexpath;
+	}
+}
+
+//添加选中对象到name space
+global proc BNS(string $ns)
+{
+$sel = `ls -sl`;
+if(size($sel))
+	{
+	if(!(`namespace -ex $ns`))namespace -add $ns;
+	for ($obj in $sel)rename $obj (":" + $ns + ":"+$obj);
+	}
+}
+
+//去除选中对象的namespace
+global proc delSelNS()
+{
+string $sel[] = `ls -sl -l -ap`;
+for($obj in $sel)
+	{
+	string $newName = withoutNamespace($obj);
+	if(strcmp($obj,$newName))
+		{
+		rename($obj,$newName);
+		$sel = `ls -sl -l -ap`;
+		}
+	}
+}
+
+//去除所有namespace
+global proc delAllNS()
+{
+string $NSes[] = `namespaceInfo -lon`;
+for($NS in $NSes)
+	{
+	if($NS == "UI" || $NS == "shared")continue;
+	namespace -mv $NS ":" -f;
+	namespace -rm $NS;
+	}
+}
+
+//替换tex为mat!!!!!!!!!!!!!!!!!!!!!!!
+global proc replaceName()
+{
+$sel = `ls -sl`;
+for($obj in $sel){
+	$newname = `substitute "tex" $obj "mat"`;
+	rename $obj $newname;
+}
+}
+
+//重命名贴图文件名
+global proc renameTexture(string $fileNode, string $newName, int $forceChangeLink)
+{
+$type = `objectType $fileNode`;
+if($type!="file"&&$type!="psdFile")return;
+string $attr = $fileNode + ".fileTextureName";
+string $filePath = getAttr($attr);
+string $newPath = dirname($filePath)+"/"+$newName;
+if(!`file -q -ex $newPath`)$state = `sysFile -rename $newPath $filePath`;
+if($state || $forceChangeLink){
+	setAttr $attr -type "string" $newPath;
+	print("succeed!\n");
+	}
+else print("false!\n");
+}
+
+//替换重命名贴图文件名
+global proc replaceRnTextures(string $fileNodes[], string $find, string $replace, int $forceChangeLink)
+{
+for($fileNode in $fileNodes)
+	{
+	string $attr = $fileNode + ".fileTextureName";
+	string $filePath = getAttr($attr);
+	$newPath = `substitute $find $filePath $replace`;
+	if($newPath == $filePath)continue;
+	print($filePath+" -> "+$newPath+" ");
+	if(!`file -q -ex $newPath`)$state = `sysFile -rename $newPath $filePath`;
+	else print($newPath+" is exist!\n");
+	if($state || $forceChangeLink){
+		setAttr $attr -type "string" $newPath;
+		if($state)print("succeed!\n");
+		print("Link's Changed!\n");
+		}
+	else print("false!\n");
+	}
+}
+
+///贴图命名管理器
+global proc textureManageOpt()
+{
+$AllFileNodes = `ls -type "file"`;
+int $size = size($AllFileNodes);
+if (`window -exists "textureManageWindow"`) deleteUI -window "textureManageWindow";
+window -t "Texture Manage" "textureManageWindow";
+	scrollLayout -hst 16 -vst 16;
+	columnLayout;
+	string $filenameCrl[];
+	for($i=0;$i<$size;$i++) {
+		textFieldGrp 
+			-l $AllFileNodes[$i] 
+			-fi (basename(getAttr($AllFileNodes[$i]+".fileTextureName"),"")) 
+			-cc ("renameTexture(\""+$AllFileNodes[$i]+"\",`textFieldGrp -q -tx filenameCtrl"+$i+"`,0)")
+			("filenameCtrl"+$i);
+		}
+showWindow;
+}
+
+///材质贴图命名管理器
+global proc materialManageOpt()
+{
+$AllMatNodes = `ls -mat`;
+if (`window -exists "materialManageWindow"`) deleteUI -window "materialManageWindow";
+window -t "Texture Manage" "materialManageWindow";
+	scrollLayout -hst 16 -vst 16;
+		columnLayout -adjustableColumn true;
+			for($matNode in $AllMatNodes){
+				$sourcePlugs = listSourcePlugs($matNode);//输入插头
+				$matFrame = `frameLayout -label $matNode -la "top" -bs "etchedIn" -li 5 -cll on -cl (!size($sourcePlugs))`;
+					columnLayout -adj true -cat "both" 10;
+						rowLayout -nc 3 -cw3 100 350 50 -ct3 "right" "both" "both";
+							text -l "Material";
+							$matNodeField = `textField -w 350 -tx $matNode`;
+							button -l "Rename" -c ("\
+								rename(\""+$matNode+"\",`textField -q -tx \""+$matNodeField+"\"`);\
+								materialManageOpt();\
+								");
+						setParent ..;
+					for($sourcePlug in $sourcePlugs){
+						string $sourceNode = basenameEx(`connectionInfo -sfd $sourcePlug`);//与输入插头连接的节点
+						string $fileNode = "";
+						if(nodeType($sourceNode)=="file")$fileNode = $sourceNode;
+						else	{
+							$fileNodes = searchLastFileNodes($sourceNode);
+							$fileNode = $fileNodes[0];
+							}
+						if($fileNode=="")continue;//跳过无File连接的插头
+						string $textureName = basename(getAttr($fileNode+".fileTextureName"),"");
+						rowLayout -nc 5	-cw5 100 100 200 50 50 -ct5 "right" "left" "left" "both" "both";
+							text -l (fileExtension($sourcePlug));//插头名
+							textField -w 100 -ed off -tx $fileNode;//file节点名
+							textField -w 200 -ed off -tx $textureName;//贴图文件名
+							$suffixField = `textField -w 50 -tx ("_"+startString(fileExtension($sourcePlug),1))`;
+							button -l "Rename" -c ("\
+								renameTexture(\""+$fileNode+"\",\""+$matNode+"\"+`textField -q -tx \""+$suffixField+"\"`+\"."+fileExtension($textureName)+"\",0);\
+								materialManageOpt();\
+								");
+						setParent ..;
+					}
+					setParent ..;
+				setParent ..;
+			}
+showWindow;
+}
+
+//◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆
+//◆◆◆◆    Tip Tools   ◆◆◆◆
+//◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆
+
+//########################################################################--------------选择工具开始
+//按通配方式选择
+global proc matchSelect(string $matchStr)
+{
+string $sel[] = `ls -sl -ap`;
+select -cl;
+for($obj in $sel)
+	{
+	if(gmatch($obj,$matchStr))
+		select -tgl $obj;
+	}
+}
+//########################################################################--------------选择工具结束
+
+//########################################################################--------------替换工具开始
+//物体替换
+global proc objReplace(string $newname, int $ins, int $ko, int $kn, int $inherits, int $up)
+{
+$sel = `ls -sl`;
+$replacer = $sel[size($sel)-1];
+select -d $replacer;
+$sel = `ls -sl`;
+float $rp[], $rpt[], $trans[];
+
+for($ori in $sel)
+	{
+	if($newname==""&&!$kn)error("error!! >_<");
+	$type = `objectType $ori`;
+	if($type!="transform")continue;
+
+	$translate = `getAttr ($ori + ".translate")`;
+	$rotate = `getAttr ($ori + ".rotate")`;
+	$scale = `getAttr ($ori + ".scale")`;
+
+	if($up)
+	{
+//		$rp = `getAttr ($ori + ".rotatePivot")`;
+//		$rpt = `getAttr ($ori + ".rotatePivotTranslate")`;
+		$tmrp = `getAttr ($ori + ".tmrp")`;
+
+//		$trans = arrayPlus(arrayPlus($translate,$rp),$rpt);
+		$trans = arrayPlus($translate,arrayMultiply($tmrp,-1));
+	}
+	else $trans = $translate;
+
+	if($ins) $clone = `instance $replacer`;
+	else $clone = `duplicate -un $replacer`;
+
+	if($inherits%2)setAttr ($clone[0] + ".translate") -type "double3" $trans[0] $trans[1] $trans[2];
+	if($inherits/2%2)setAttr ($clone[0] + ".rotate") -type "double3" $rotate[0] $rotate[1] $rotate[2];
+	if($inherits/4%2)setAttr ($clone[0] + ".scale") -type "double3" $scale[0] $scale[1] $scale[2];
+
+	if(!$ko)
+		{
+		delete $ori; 
+		if($kn)rename $clone[0] $ori;
+		else rename $clone[0] $newname;
+		}
+	else rename $clone[0] $newname;
+	}
+}
+//########################################################################--------------替换工具结束
+
+//########################################################################--------------随机和噪波工具开始
+//所选择的poly顶点Y噪波
+global proc ynoise(float $range,float $wavelengh)
+{
+$sel = `filterExpand -sm 31`;
+$i=0;
+for($obj in $sel)
+{
+	$ymove = $range*noise($i*$wavelengh);
+	select $obj;
+	move -r 0 $ymove 0;
+	$i++;
+}
+select $sel;
+}
+
+//打开transform的位移信息窗口
+global proc translateInfo()
+{
+string $sel[] = `ls -sl -typ transform`;
+window -t ("translateInfo of "+$sel[0]);
+columnLayout;
+//	rowLayout -nc 2;
+	text -l $sel[0];
+	attrFieldGrp -attribute ($sel[0]+".t");
+	attrFieldGrp -attribute ($sel[0]+".rp");
+	attrFieldGrp -attribute ($sel[0]+".rpt");
+	attrFieldGrp -attribute ($sel[0]+".tmrp");
+//	setParent ..;
+showWindow;
+}
+
+//随机位移
+global proc randomTransform(int $cmd, int $lockratio, int $abs, float $xmin, float $xmax, float $ymin, float $ymax, float $zmin, float $zmax)		//---------Set Transform Of The Selected Objects
+{
+$sel = `ls -sl`;
+float $ori[];
+for($obj in $sel)
+	{
+	$type = `objectType $obj`;
+	if($type!="transform")continue;
+
+	$x = rand($xmin,$xmax);
+	$y = rand($ymin,$ymax);
+	$z = rand($zmin,$zmax);
+
+	switch($cmd)
+		{
+		case 0: {
+			if(!$abs)$ori = getAttr($obj + ".translate");
+			else $ori = {0,0,0};
+			if($lockratio)setAttr($obj + ".translate") -type "double3" ($x+$ori[0]) ($x+$ori[1]) ($x+$ori[2]);
+			else setAttr($obj + ".translate") -type "double3" ($x+$ori[0]) ($y+$ori[1]) ($z+$ori[2]);
+			}
+		break;
+		case 1: {
+			if(!$abs)$ori = getAttr($obj + ".rotate");
+			else $ori = {0,0,0};
+			if($lockratio)setAttr($obj + ".rotate") -type "double3" ($x+$ori[0]) ($x+$ori[1]) ($x+$ori[2]);
+			else setAttr($obj + ".rotate") -type "double3" ($x+$ori[0]) ($y+$ori[1]) ($z+$ori[2]);
+			}
+		break;
+		case 2: {
+			if(!$abs)$ori = getAttr($obj + ".scale");
+			else $ori = {0,0,0};
+			if($lockratio)setAttr($obj + ".scale") -type "double3" ($x+$ori[0]) ($x+$ori[1]) ($x+$ori[2]);
+			else setAttr($obj + ".scale") -type "double3" ($x+$ori[0]) ($y+$ori[1]) ($z+$ori[2]);
+			}
+		break;
+		}
+	}
+}
+
+//########################################################################--------------随机和噪波工具结束
+
+//########################################################################--------------排序工具开始
+
+//根据ordby排序objs,两数组一一对应
+global proc orderBy(string $objs[], float $ordby[])
+{
+	if(size($objs)<size($ordby))error("error!!");
+
+	for($to=size($ordby); $to>0; $to--)
+	{
+		$comp = 0;
+		$maxpos = 0;
+		for($cursor=0; $cursor<$to; $cursor++)
+			{
+			if($ordby[$cursor]>$comp)
+				{
+				$comp = $ordby[$cursor];
+				$maxpos = $cursor;
+				}
+			}
+		$temp1 = $ordby[$maxpos];
+		$ordby[$maxpos] = $ordby[$to-1];
+		$ordby[$to-1] = $temp1;
+		$temp2 = $objs[$maxpos];
+		$objs[$maxpos] = $objs[$to-1];
+		$objs[$to-1] = $temp2;
+	}
+}
+
+//根据距离排序，refer为参考点坐标(长度为3)，ord为升降序标志
+global proc orderByDistance(float $refer[],int $ord)
+{
+$sel = `ls -sl -typ transform`;
+float $distance[];
+for($i=0;$i<size($sel);$i++)
+	{
+	$t = `getAttr($sel[$i]+".t")`;
+	$tmrp = `getAttr($sel[$i]+".tmrp")`;
+	float $x = $t[0] - $tmrp[0] - $refer[0];
+	float $y = $t[1] - $tmrp[1] - $refer[1];
+	float $z = $t[2] - $tmrp[2] - $refer[2];
+	$distance[$i] = sqrt($x*$x + $y*$y + $z*$z);
+	}
+orderBy($sel,$distance);
+for($obj in $sel)
+	if($ord)reorder -f $obj;
+	else reorder -b $obj;
+print $sel;
+}
+
+//########################################################################--------------排序工具结束
+
+//########################################################################--------------模型编辑工具开始
+//使指定面变平
+global proc makeFacePlane(string $selFace)
+{
+string $selVtx[] = `polyListComponentConversion -ff -tv $selFace`;
+string $vtxes[] = `ls -fl $selVtx`;
+vector $vrts[] = getVrts($vtxes);
+vector $pnts[] = getPnts($vtxes);
+vector $selPoints[] = vectorArrayPlus($vrts,$pnts);
+vector $selNormal[] = getNormalVtxface($selFace);
+vector $faceNormal = averageVectors($selNormal);//面的法向量
+vector $faceCenter = centerVectors(minVector($selPoints),maxVector($selPoints));//面的中心点
+$size = size($selPoints);
+for($i=0;$i<$size;$i++){
+	vector $newPoint = pointOfPlaneIntersectLine($faceNormal, $faceCenter, $faceNormal, $selPoints[$i]);//点到面中心与法向量所确定平面的映射
+	vector $newpnt = $newPoint - $vrts[$i];
+	string $pntName = substituteAllString($vtxes[$i],"vtx","pnts");
+	setAttr $pntName ($newpnt.x) ($newpnt.y) ($newpnt.z); 
+	}
+}
+
+//使选中的面依次变平
+global proc makeFacesPlane()
+{
+string $sel[] = `filterExpand -sm 34 -fp 1`;
+for($face in $sel)	makeFacePlane($face);
+}
+
+//旋转两个四边形的邻接边
+global proc string spinEdge(string $edge)
+{
+	string $twoFaces[] = filterExpand("-sm",34,"-ex",1,polyListComponentConversion("-fe", "-tf", $edge));//一条的边两个邻接面
+	string $twoVtxes[] = filterExpand("-sm",31,"-ex",1,polyListComponentConversion("-fe", "-tv", $edge));//一条边的两个端点
+
+	int $s = size($twoFaces);
+	if($s>2){
+		print("error!edge is in more than 3 faces");
+		return(0);
+		}
+	if($s>2){
+		print("error!edge is border");
+		return(0);
+		}
+		
+	string $buffer[];
+	tokenize($edge,"[",$buffer);
+	string $edgeBasename = $buffer[0];	//边的基础名，不带ID号
+	tokenize($edge,".",$buffer);
+	string $objName = $buffer[0];	//物体名称
+	
+	string $edgesIDFace0[] = edgeIDFace($twoFaces[0]);	//第一个面的边ID序列
+	string $edgesIDFace1[] = edgeIDFace($twoFaces[1]);	//第二个面的边ID序列
+	int $edgeID = componentId($edge);
+	int $index0 = indexStrArray($edgesIDFace0, $edgeID)-1;	//交接边在第一个面的边序列中的位置
+	int $index1 = indexStrArray($edgesIDFace1, $edgeID)-1;	//交接边在第二个面的边序列中的位置
+	
+	$index0 -= 1;
+	if($index0<0)$index0 += size($edgesIDFace0);	//交接边在第一个面顺时针方向的邻边在第一个面的顶点序列中的位置
+	$index1 -= 1;
+	if($index1<0)$index1 += size($edgesIDFace1);	//交接边在第二个面顺时针方向的邻边在第二个面的顶点序列中的位置
+		
+	string $edgeA = $edgeBasename+"["+$edgesIDFace0[$index0]+"]";	//交接边在第一个面顺时针方向的邻边
+	string $edgeB = $edgeBasename+"["+$edgesIDFace1[$index1]+"]";	//交接边在第二个面顺时针方向的邻边
+	string $edgeATwoVtxes[] = polyListComponentConversion("-fe", "-tv", $edgeA);//转换成点
+	string $edgeBTwoVtxes[] = polyListComponentConversion("-fe", "-tv", $edgeB);//转换成点
+	
+	delete($edge);//删除交接边，部分边和面的ID将发生变化，点ID不变
+	
+	string $nEdgeA[] = polyListComponentConversion("-fv", "-te", "-in", $edgeATwoVtxes);//交接边在第一个面顺时针方向的邻边(转换成边)
+	string $nEdgeB[] = polyListComponentConversion("-fv", "-te", "-in", $edgeBTwoVtxes);//交接边在第二个面顺时针方向的邻边(转换成边)
+	
+	string $res[] = polySplit("-ch", 1, "-ep", (int)componentId($nEdgeA[0]), 0, "-ep", (int)componentId($nEdgeB[0]), 1, $objName);
+	return $res[0];
+}
+
+//旋转选中的邻接边
+global proc spinE()
+{
+	$sel = filterExpand("-sm",32, "-ex", 1);
+	select(spinEdge($sel[0]));
+}
+
+//X对齐左右模型，未完成！！！！！
+global proc MirrorX(int $LR)
+{
+string $mesh = firstSelectedMesh();
+string $vtxStr[] = getAttr($mesh+".vtxMirrorXInfo");
+string $vtxStrL[] = stringToStringArray($vtxStr[0],"|");
+string $vtxStrR[] = stringToStringArray($vtxStr[1],"|");
+switch($LR){
+	case 0: //左边适配右边
+		$size = size($vtxStrR);
+		for($i=0;$i<$size;$i++){
+			string $vrtStrL = substituteAllString($vtxStrL[$i],"vrts","vtx");
+			string $pntStrL = substituteAllString($vtxStrL[$i],"pnts","vtx");
+			string $vrtStrR = substituteAllString($vtxStrR[$i],"vrts","vtx");
+			string $pntStrR = substituteAllString($vtxStrR[$i],"pnts","vtx");
+			vector $vrt = getAttr($mesh+$vrtStrR);
+			vector $pnt = getAttr($mesh+$pntStrR);
+			setAttr(($mesh+$vrtStrL),"-type", "double3",(-$vrt.x),$vrt.y,$vrt.z);
+			setAttr(($mesh+$pntStrL),"-type", "double3",(-$pnt.x),$pnt.y,$pnt.z);
+			}
+		break;
+	case 1: //右边适配左边
+		break;
+	}
+}
+
+//保存顶点组在$vtxes中，对应的三维信息在$pvts中，pvts为mesh顶点的pnts和vrts属性的加值
+$vtxes = `filterExpand -ex true -sm 31`;
+vector $pvts[];
+for($i=0;$i<size($vtxes);$i++)
+{
+	float $pt[] = getAttr(substituteAllString($vtxes[$i], ".vtx", ".pt"));
+	float $vt[] = getAttr(substituteAllString($vtxes[$i], ".vtx", ".vt"));
+	$pvts[$i] = <<$pt[0],$pt[1],$pt[2]>> + <<$vt[0],$vt[1],$vt[2]>>;
+}
+
+//恢复mesh顶点偏移值pnt(tweaks)为0,(可以恢复模型freeze时的状态)
+global proc resetPnts()
+{
+$vtxes = `filterExpand -ex true -sm 31`;
+for($vtx in $vtxes)setAttr((substituteAllString($vtx, ".vtx", ".pt")),0,0,0);
+}
+
+//筛选重复的面
+global proc string[] filterDuplicateFace()
+{
+string $allFaces[] = filterExpand("-sm",34,"-ex",1,polyListComponentConversion("-tf"));
+string $foundFaces[];string $foundFacesVtxSequence[]; //查找过的点序列表,包含两个数组，一个面数组作为索引，一个面信息数组存放数据
+string $duplicateFaces[]; //重复的面数组
+for($face in $allFaces)
+	{
+	string $faceInfo[] = `polyInfo -fv $face`;
+	string $faceVtxArray[] = stringToStringArray($faceInfo[0], " :\n");
+	stringArrayRemoveAtIndex(0, $faceVtxArray);
+	stringArrayRemoveAtIndex(0, $faceVtxArray);
+	string $faceVtxSequence = stringArrayToString($faceVtxArray, ",");
+
+	for($foundFaceVtxSequence in $foundFacesVtxSequence)
+		{
+		$foundFaceVtxArray = stringToStringArray($foundFaceVtxSequence, ",");
+		if(size(stringArrayRemove($faceVtxArray,$foundFaceVtxArray))==0&&size(stringArrayRemove($foundFaceVtxArray,$faceVtxArray))==0)	//判断内容是否相同
+			{
+			$duplicateFaces[size($duplicateFaces)] = $face;
+			break;	//退出点序列表遍历
+			}
+		}
+	$foundFacesVtxSequence[size($foundFacesVtxSequence)] = stringArrayToString($faceVtxArray, ",");	//遍历结束后记录到以查找面的点序列（无论重复与否都记录）
+	}
+return $duplicateFaces;
+}
+
+//筛选交叠的面
+global proc string[] filterOverlapingFace()
+{
+string $allFaces[] = filterExpand("-sm",34,"-ex",1,polyListComponentConversion("-tf"));
+string $allFacesVtxSequence[];	//所有的面的点序列
+string $overlapingFaces[]; //交叠的面数组
+
+for($face in $allFaces)
+	{
+	string $faceInfo[] = `polyInfo -fv $face`;
+	string $faceInfoArray[] = stringToStringArray($faceInfo[0], " :\n");
+	stringArrayRemoveAtIndex(0, $faceInfoArray);
+	stringArrayRemoveAtIndex(0, $faceInfoArray);
+
+	$allFacesVtxSequence[size($allFacesVtxSequence)] = stringArrayToString($faceInfoArray, ",");
+	}
+
+for($i=0;$i<size($allFacesVtxSequence);$i++)
+	{
+	$faceVtxArray = stringToStringArray($allFacesVtxSequence[$i], ",");	//当前面的点序列转换为点集数组
+
+	$otherFacesVtxSequence = $allFacesVtxSequence;
+	stringArrayRemoveAtIndex($i, $otherFacesVtxSequence);	//删除当前项
+
+	for($otherFaceVtxSequence in $otherFacesVtxSequence)
+		{
+		$otherFaceVtxArray = stringToStringArray($otherFaceVtxSequence, ",");	//转换其他面的点序列为点集数组
+
+		if(size(stringArrayRemove($otherFaceVtxArray,$faceVtxArray))==0)	//判断当前点集是否包含在其他面的点集中
+			{
+			if(size(stringArrayRemove($faceVtxArray,$otherFaceVtxArray))>0)	//判断其他面点集也包含在当前面点集中，如果不包含说明当前面点集是其他面点集的真子集。
+				{
+				$overlapingFaces[size($overlapingFaces)] = $allFaces[$i];	//标记当前面为重复面
+				break;	//退出其他面遍历
+				}
+			}
+		}
+	}
+return $overlapingFaces;
+}
+
+//将物体移动到轴心位置（轴心相对物体坐标归零）
+global proc resetLocalPivot()
+{
+	$sel = `ls -sl -type "transform"`;
+	for($obj in $sel)
+	{
+		float $rp[] = getAttr($obj+".rp");
+		float $rpt[] = getAttr($obj+".rpt");
+		matrix $p[1][4] = array2Matrix14(arrayPlus($rp,$rpt));
+		matrix $mt[4][4] = getWorldXformMatrix($obj);
+		matrix $wp[1][4] = matrix14Multiply($p, $mt);
+		
+		float $pwt[];
+		string $parents[] = `listRelatives -p -f $obj`;
+		if(size($parents)>0){
+			matrix $pmt[4][4] = getWorldXformMatrix($parents[0]);	
+			$pwt = {$pmt[3][0],$pmt[3][1],$pmt[3][2]};
+		}else{
+			$pwt = {0.0,0.0,0.0};
+		}
+		print($pwt);
+		print($wp);
+		move -rpr $pwt[0] $pwt[1] $pwt[2] $obj;
+		makeIdentity -apply true -t 1 -r 0 -s 0 -n 0 $obj;
+		move -rpr $wp[0][0] $wp[0][1] $wp[0][2] $obj;
+	}
+}
+
+//########################################################################--------------模型编辑工具结束
+
+//########################################################################--------------模型测量工具开始
+//输出两点的距离
+global proc float distanceOfPoints(string $p0,string $p1)
+{
+float $pt[] = getAttr(substituteAllString($p0, ".vtx", ".pt"));
+float $vt[] = getAttr(substituteAllString($p0, ".vtx", ".vt"));
+vector $pvt0 = <<$pt[0],$pt[1],$pt[2]>> + <<$vt[0],$vt[1],$vt[2]>>;
+float $pt[] = getAttr(substituteAllString($p1, ".vtx", ".pt"));
+float $vt[] = getAttr(substituteAllString($p1, ".vtx", ".vt"));
+vector $pvt1 = <<$pt[0],$pt[1],$pt[2]>> + <<$vt[0],$vt[1],$vt[2]>>;
+return mag($pvt0 - $pvt1);
+}
+
+//输出条边的长度
+global proc float edgesLength(string $edge)
+{
+$vtx2 = polyListComponentConversion("-fe","-tv",$edge);
+return distanceOfPoints($vtx2[0],$vtx2[1]);
+}
+
+//########################################################################--------------模型测量工具结束
+
+//########################################################################--------------UV编辑工具开始
+//对齐所选UV的极限四边到指定位置
+global proc uvBoundingAlign(float $u, float $v, int $flag)
+{
+vector $uvBounding[] = getUVsBounding();
+vector $min = $uvBounding[0];
+vector $max = $uvBounding[1];
+vector $center = $uvBounding[2];
+switch ($flag) {
+	case 0: //中心
+		$mu = $u - $center.x;
+		$mv = $v - $center.y;
+		break;
+	case 1: //左下
+		$mu = $u - $min.x;
+		$mv = $v - $min.y;
+		break;
+	case 2: //下
+		$mu = 0;
+		$mv = $v - $min.y; 
+		break;
+	case 3: //右下
+		$mu = $u - $max.x;
+		$mv = $v - $min.y;
+		break;
+	case 4: //左
+		$mu = $u - $min.x;
+		$mv = 0;
+		break;
+	case 5: //右
+		$mu = $u - $max.x;
+		$mv = 0;
+		break;
+	case 6: //左上
+		$mu = $u - $min.x;
+		$mv = $v - $max.y;
+		break;
+	case 7: //上
+		$mu = 0;
+		$mv = $v - $max.y;
+		break;
+	case 8: //右上
+		$mu = $u - $max.x;
+		$mv = $v - $max.y;
+		break;
+	}
+polyEditUV("-u", $mu, "-v", $mv);
+}
+//########################################################################--------------UV编辑工具结束
+
+//########################################################################--------------顶点色工具开始
+//顶点色色相饱和度编辑
+global proc vtxColorHsv(vector $hsv)
+{
+$vtxes= `ls -sl -ap -fl`;
+vector $colorOld;
+vector $colorNew;
+float $h = ($hsv.x);
+float $s = ($hsv.y);
+float $v = ($hsv.z);
+for($i=0;$i<size($vtxes);$i++){
+	vector $colorOld = `polyColorPerVertex -q -rgb $vtxes[$i]`;
+	vector $hsvOld = rgb_to_hsv($colorOld);
+	float $hOld = ($hsvOld.x);
+	float $sOld = ($hsvOld.y);
+	float $vOld = ($hsvOld.z);
+	float $hNew = $hOld + $h/360;
+	float $hNew = $hNew - floor($hNew);
+	float $sNew = $sOld * ($s/100+1);
+	float $vNew = $vOld;
+	vector $hsvNew = <<$hNew, $sNew, $vNew>>;
+	vector $rgbOld = hsv_to_rgb($hsvNew);
+	float $rOld = ($rgbOld.x);
+	float $gOld = ($rgbOld.y);
+	float $bOld = ($rgbOld.z);
+	float $rNew = ($v<0)?$rOld*($v/100+1):$rOld+(1-$rOld)*$v/100;
+	float $gNew = ($v<0)?$gOld*($v/100+1):$gOld+(1-$gOld)*$v/100;
+	float $bNew = ($v<0)?$bOld*($v/100+1):$bOld+(1-$bOld)*$v/100;
+	polyColorPerVertex -rgb $rNew $gNew $bNew $vtxes[$i];
+	} 
+}
+
+//顶点色色阶编辑
+global proc vtxColorLevel(float $inMin, float $inMax, float $outMin, float $outMax)
+{
+$vtxes= `ls -sl -ap -fl`;
+vector $colorOld;
+vector $colorNew;
+for($i=0;$i<size($vtxes);$i++){
+	vector $colorOld = `polyColorPerVertex -q -rgb $vtxes[$i]`;
+	float $rOld = ($colorOld.x);
+	float $gOld = ($colorOld.y);
+	float $bOld = ($colorOld.z);
+	float $rNew = clamp(0,1,level($inMin, $inMax, $outMin, $outMax, $rOld));
+	float $gNew = clamp(0,1,level($inMin, $inMax, $outMin, $outMax, $gOld));
+	float $bNew = clamp(0,1,level($inMin, $inMax, $outMin, $outMax, $bOld));
+	polyColorPerVertex -rgb $rNew $gNew $bNew $vtxes[$i];
+	} 
+}
+//########################################################################--------------顶点色工具结束
+
+//########################################################################--------------纹理工具开始
+//读取2D纹理的指定位置颜色
+global proc vector outColorTexture2D(string $texName, float $u, float $v)
+{
+setAttr ($texName + ".uv") ($u) ($v);
+vector $outColor = `getAttr ($texName + ".outColor")`;
+return $outColor;
+}
+//########################################################################--------------纹理工具结束
+
+//########################################################################--------------系统工具开始
+//设置当前路径为工作目录
+global proc setProjectToPwd()
+{
+setProject(`pwd`);
+}
+
+//导出贴图文件到指定目录
+global proc exportTexture(string $dir)	//--------------Export Texture File
+{
+	$fileNodes=`ls -type "file"`;
+	$workspaceRoof = `workspace -q -rd`;
+	$destinationDir = $workspaceRoof+$dir;
+	sysFile -md $destinationDir;
+	for($fileNode in $fileNodes)
+		{
+		$fileName = getAttr($fileNode+".fileTextureName");
+		$basename = basename($fileName,"");
+		sysFile -cp ($destinationDir+"/"+$basename) $fileName;
+		}
+	print("Export Path" + $destinationDir);
+	$path = substituteAllString($destinationDir, "/", "\\") + "\\";
+	system("explorer "+$path);
+}
+
+// 导出指定目录下所有mb文件到fbx
+global proc exportMbToFbx(string $path){
+	string $fileList[] = `getFileList -folder $path -fs "*.mb"`;
+	string $outPath = $path + "fbx/";
+	if (size($fileList)>0) sysFile -makeDir $outPath;
+	for ($f in $fileList) {
+		string $filePath = $path + $f;
+		string $outFilePath = $outPath + $f;
+		print("Export File Path:"+$outFilePath);
+		file -f -options "v=0;"  -typ "mayaBinary" -o $filePath;
+		file -force -options "v=0;" -type "FBX export" -pr -ea $outFilePath;
+	}
+}
+
+//########################################################################--------------系统工具结束
+
+//◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆
+//◆◆◆◆  Create Tools  ◆◆◆◆
+//◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆
+
+//建立螺旋线
+global proc string createHelixCurve(float $coils, float $height, float $width, int $subCoil, float $scale, int $direction)
+{
+float $perCoilH = $height / $coils;
+float $spans = $subCoil * $coils;
+float $perSpanAngle = ($direction == 1) ? (deg_to_rad(360 / $subCoil)) : (-deg_to_rad(360 / $subCoil));
+float $radius = $width/2;
+
+$curveName = `curve -d 3 -p $radius 0 0`;
+for($i=1;$i<=$spans;$i++)
+	{
+	$x = cos($i*$perSpanAngle)*$radius*(1+($scale-1)*$i);
+	$y = $i*$perCoilH;
+	$z = sin($i*$perSpanAngle)*$radius*(1+($scale-1)*$i);
+	curve -a -p $x $y $z $curveName;
+	}
+return $curveName;
+}
+
+//建立管状体
+global proc string tubeSurface(string $path, float $radius, float $scale)
+{
+string $profile[] = `circle -c 0 0 0 -nr 0 0 0 -sw 360 -r $radius -d 3 -ut 0 -tol 0 -s 8 -ch 1 -n ($path+"_profile")`;
+string $makeProfileNode[] = `listConnections ($profile[0] + ".create")`;
+
+string $pathStartPosition = `shadingNode -asUtility  pointOnCurveInfo`;
+connectAttr -f ($path+".worldSpace[0]")			($pathStartPosition+".inputCurve") 	;
+connectAttr -f ($pathStartPosition+".position")		($profile[0]+".translate")			;
+
+tangentConstraint -weight 1 -aimVector 0 0 1 -upVector 0 1 0 -worldUpType "vector" -worldUpVector 0 1 0 $path $profile[0];
+
+string $resultTube[] = `extrude -ch true -rn true -po 0 -et 2 -ucp 0 -fpt 0 -upn 0 -rotation 0 -scale $scale -rsp 1 -n ($path+"_tube") $profile[0] $path`;
+string $makeTubeNode[] = `listConnections ($resultTube[0] + ".create")`;
+
+string $tubeGroup = `group -n tube1 $path $profile[0] $resultTube[0]`;
+
+addAttr -ln "radius" -at double  $tubeGroup;
+setAttr ($tubeGroup+".radius") $radius;
+connectAttr -f ($tubeGroup+".radius") ($makeProfileNode[0]+".radius");
+addAttr -ln "extrudeScale" -at double  $tubeGroup;
+setAttr ($tubeGroup+".extrudeScale") $scale;
+connectAttr -f ($tubeGroup+".extrudeScale") ($makeTubeNode[0]+".scale");
+
+return ($tubeGroup+"|"+$resultTube[0]);
+}
+
+//建立螺旋曲线
+global proc string helixCurve(string $path, float $coils, float $subCoil, float $radius, float $scale, int $direction)
+{
+float $spans 		= $subCoil * $coils;
+float $numCvs		= $spans + 1;
+float $perIncrementV	= 1 / $spans;
+float $perIncrementU	= ($direction>0) ? 1/$subCoil : -1/$subCoil;
+
+string $tube = tubeSurface($path,$radius,$scale);
+rebuildSurface -ch 1 -rpo 1 -rt 1 -end 1 -kr 0 -kcp 0 -kc 0 -su 4 -du 3 -sv 4 -dv 3 -tol 0 -fr 0  -dir 2 $tube;
+setAttr ($tube+".overrideEnabled") 1;
+setAttr ($tube+".overrideShading") 0;
+setAttr ($tube+".overrideTexturing") 0;
+setAttr ($tube+".overridePlayback") 0;
+
+string $resultCurve = `curveOnSurface -degree 2 -uv 0 0 $tube`;
+
+for($i=1;$i<$numCvs;$i++)curveOnSurface -a -uv ($perIncrementU*$i) ($perIncrementV*$i) ($tube + "->" + $resultCurve);
+
+return $tube + "->" + $resultCurve;
+}
+
+//◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆
+
+
+
+//########################################################################--------------动画工具开始
+//◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆
+//◆◆◆◆  Animation Tools  ◆◆◆◆
+//◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆
+
+// 获取物体世界坐标变换矩阵
+global proc matrix getWorldXformMatrix(string $obj){
+	string $parents[] = `listRelatives -p -f $obj`;
+	if(size($parents)==0){
+		// 没有上级返回本级
+		return array2Matrix44(getAttr($obj+".xformMatrix"));
+	}else{
+		// 有上级本级*上级
+		matrix $pmt[4][4] = getWorldXformMatrix($parents[0]);
+		matrix $mt[4][4] = array2Matrix44(getAttr($obj+".xformMatrix"));
+		return matrix44Multiply($mt, $pmt);
+	}
+}
+
+// 获取物体世界坐标
+global proc float[] getWorldTranslate(string $obj){
+	matrix $mt[4][4] = getWorldXformMatrix($obj);
+	return {$mt[3][0],$mt[3][1],$mt[3][2]};
+}
+
+// 根据在给定物体的位置创建骨骼（用于autoBind()中递归调用）
+global proc string createJointByObj(string $obj, int $isRoot){
+	$rp = getAttr($obj+".rp");
+	$rpt = getAttr($obj+".rpt");
+	matrix $p[1][4] = array2Matrix14(arrayPlus($rp,$rpt));
+	matrix $mt[4][4] = getWorldXformMatrix($obj);
+	matrix $wp[1][4] = matrix14Multiply($p, $mt);
+	$t = {$wp[0][0],$wp[0][1],$wp[0][2]};
+
+	$r = getAttr($obj+".rotate");
+	$s = getAttr($obj+".scale");
+	string $name;
+	if ($isRoot) {
+		$name = "root";
+	}else{
+		string $strs[];
+		tokenize $obj "|" $strs;
+		$name = $strs[size($strs)-1];
+	}
+	string $joint = `joint -a -p $t[0] $t[1] $t[2] -s $s[0] $s[1] $s[2] -n $name`;
+	rotate $r[0] $r[1] $r[2] $joint;
+	$chilren = `listRelatives -c -f -typ "transform" $obj`;
+	for ($c in $chilren) {
+		select $joint;
+		createJointByObj($c,false);
+	}
+	return $joint;
+}
+
+//自动版定工具
+global proc string[] autoBind(){
+	$objs = `ls -sl -l`;
+	select -d;
+	string $joints[];
+	string $vtxGroups[] = {};//顶点分组，用于区分合并后的物体
+	int $start = 0;
+	for($i=0; $i<size($objs); $i++){
+		$joints[$i] = createJointByObj($objs[$i],($i==0));
+		select $joints[0];
+		// 顶点分组
+		$vtxs = `filterExpand -ex true -sm 31 ($objs[$i] + ".vtx[*]")`;
+	    $end = $start+size($vtxs)-1;
+	    $vtxGroups[$i] = ".vtx["+$start+":"+$end+"]";
+	    $start = $end + 1;
+	}
+	print("joint ready!");
+	string $uniteInfo[] = `polyUnite -ch 1 -mergeUVSets 1 $objs`;
+	print("combin objects complete! newObject: " + $uniteInfo[0]);
+	select -r $uniteInfo;
+	DeleteHistory;
+	string $skin[] = `skinCluster -mi 2 $joints[0] $uniteInfo[0]`;
+	for($i=0; $i<size($objs); $i++){
+		skinPercent( "-transformValue", $joints[$i], 1.0, $skin[0], $vtxGroups[$i]);
+	}
+	return {$uniteInfo[0], $skin[0], $joints[0]};
+}
+//########################################################################--------------动画工具结束
+
+//◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆
+
+XXT_menu();
+
+python("import XXTools as xxt");
