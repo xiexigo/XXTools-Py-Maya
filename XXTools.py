@@ -62,6 +62,20 @@ def checkSelectedObjectUVSetCount(number):
 
 #################################################
 
+# 获取所有子物体
+def getAllChildren(obj):
+	children = []
+	cs = cmd.listRelatives(obj, c=True, f=True, typ="transform")
+	for c in (cs or []):
+		children.append(c)
+		children.extend(getAllChildren(c))
+	return children
+
+# 获取无路径名称
+def getNoPathName(fullname):
+	names = fullname.split("|")
+	return names[-1]
+
 # two array add one by one
 def arrayPlus(a,b):
 	result = []
@@ -214,7 +228,7 @@ def MultiBind(name = None):
 		nodes = []
 		parent = cmd.listRelatives(objs[0], parent = True, fullPath = True)
 		locator = "|"+cmd.spaceLocator(n = "root")[0]
-		locator = cmd.parent(locator, parent)
+		locator = cmd.parent(locator, parent)[0]
 		vtxStartIndex = 0
 		for obj in objs:
 			t = Transform()
@@ -237,4 +251,4 @@ def MultiBind(name = None):
 		if name :
 			outObj = cmd.ls(cmd.rename(outObj, name), l = True)[0]
 		outObj = cmd.parent(outObj, parent)[0]
-		return (outObj,skin,joints)
+		return (outObj,locator,joints)

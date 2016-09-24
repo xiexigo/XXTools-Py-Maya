@@ -1,6 +1,7 @@
 import XXTools as xxt
 import maya.cmds as cmd
 import math as math
+import re
 
 #坦克绑定(全骨骼版)
 def TankBind():
@@ -31,8 +32,7 @@ def TankBind():
 	    cmd.setAttr(obj+".translate", t[0],t[1],t[2])
 
 #轮子分组
-def GroupWheel():
-	wheels = cmd.ls(sl = True, l = True, type = "transform")
+def GroupWheel(wheels):
 	if len(wheels)<=0:
 		return
 	cmd.makeIdentity(apply=True, t=1, r=1, s=1, n=0, pn=1)
@@ -68,6 +68,7 @@ def GroupWheel():
 	cmd.select(ws, r=True)
 	cmd.makeIdentity(apply=True, t=1, r=1, s=1, n=0, pn=1)
 	cmd.CenterPivot()
+	return ws
 
 #绑定轮子添加轮子动画
 def BindWheel():
@@ -78,6 +79,7 @@ def BindWheel():
 		cmd.setKeyframe(attr, v=0, t=0)
 		cmd.setKeyframe(attr, v=360, t=30)
 		cmd.keyTangent(attr, itt = "spline", ott = "spline")
+	return bindInfo
 
 #获取物体包围盒
 def GetSize(obj):
@@ -95,9 +97,8 @@ def GetSize(obj):
 	return (_max[0] - _min[0], _max[1] - _min[1], _max[2] - _min[2])
 
 #设置炮台,制作动画
-def SetCannon(angle = 10, distance = 0.2):
+def SetCannon(cannon, angle, distance):
 	angle = -angle
-	cannon = cmd.ls(sl=True, l = True, type = "transform")[0]
 	barrel1 = cmd.listRelatives(cannon, c=True, f=True, typ="transform")[0]
 	barrel2 = cmd.listRelatives(barrel1, c=True, f=True, typ="transform")[0]
 	size = GetSize(barrel2)
@@ -129,6 +130,56 @@ def SetCannon(angle = 10, distance = 0.2):
 	cmd.keyTangent(barrel2, at="translateZ", itt = "spline", ott = "spline")
 	barrel2 = cmd.rename(barrel2, "barrel1")
 
+def Classify(tank):
+	body = None
+	cannon = None
+	wheels = []
+	for child in xxt.getAllChildren(tank):
+		if xxt.getNoPathName(child)=="Body":
+			body = child
+		elif xxt.getNoPathName(child)=="Cannon":
+			cannon = child
+		elif re.match("Wheel+", xxt.getNoPathName(child)):
+			wheels.append(child)
+	return(body,cannon,wheels)
+
+
+def AutoPreBind():
+	tanks = cmd.ls(sl = True, l = True, type = "transform")
+	for tank in tanks:
+		c = Classify(tank)
+		cannon = c[1]
+		wheels = c[2]
+		cannon = cmd.parent(cannon, tank)[0]
+		wheels = GroupWheel(wheels)
+		for i in range(len(wheels)):
+			wheels[i] = cmd.parent(wheels[i], tank)[0]
+		cmd.select(wheels, r=True)
+
+def AutoDoBind():
+	tanks = cmd.ls(sl = True, l = True, type = "transform")
+	for tank in tanks:
+		t = cmd.getAttr(tank+".translate")[0]
+		cmd.setAttr(tank+".translate",0,0,0)
+		c = Classify(tank)
+		print(c)
+		cannon = c[1]
+		wheels = c[2]
+		cmd.select(wheels, r=True)
+		bindInfo = BindWheel();
+		wheel = bindInfo[0]
+		root = bindInfo[1]
+		wheel = cmd.parent(wheel, root)[0]
+		cannon = cmd.parent(cannon, root)[0]
+		cmd.setAttr(tank+".translate",t[0],t[1],t[2])
+
+def DoCannons(angle = 10, distance = 0.2):	
+	tanks = cmd.ls(sl = True, l = True, type = "transform")
+	for tank in tanks:
+		c = Classify(tank)
+		cannon = c[1]
+		SetCannon(cannon, angle, distance)
+
 #坦克工具窗口
 def ShowWindowTank():
 	if cmd.window("windowTank", ex=True):
@@ -136,10 +187,10 @@ def ShowWindowTank():
 	window = cmd.window("windowTank", t="Tank Binding", s=False, rtf=True)
 	cmd.columnLayout( adjustableColumn=True )
 	cmd.button(label="全骨骼版坦克绑定（过期）", w=300, command=("TankBind()"))
-	cmd.button(label="左右轮合并", w=300, command=("GroupWheel()"))
-	cmd.button(label="绑定轮子", w=300, command=("BindWheel()"))
+	cmd.button(label="整理结构（为绑定做准备）", w=300, command=("AutoPreBind()"))
+	cmd.button(label="绑定坦克（只有轮子）", w=300, command=("AutoDoBind()"))
 	angleField = cmd.floatSliderGrp(label='炮管仰角', extraLabel='℃', field=True, minValue=0.0, maxValue=30.0, value=0, step=5, fieldStep=5)
-	cmd.button(label="设置炮台", w=300, command=lambda c:SetCannon(angle=cmd.floatSliderGrp(angleField, q=True, v=True)))
+	cmd.button(label="设置炮台", w=300, command=lambda c:DoCannons(angle=cmd.floatSliderGrp(angleField, q=True, v=True)))
 	cmd.setParent('..')
 	cmd.showWindow(window)
 
