@@ -35,8 +35,8 @@ def TankBind():
 def GroupWheel(wheels):
 	if len(wheels)<=0:
 		return
-	cmd.makeIdentity(apply=True, t=1, r=1, s=1, n=0, pn=1)
-	cmd.CenterPivot()
+	cmd.makeIdentity(wheels, apply=True, t=1, r=1, s=1, n=0, pn=1)
+	cmd.CenterPivot(wheels)
 	parent = cmd.listRelatives(wheels[0], parent = True, fullPath = True)[0]
 	center = 0
 	if parent:
@@ -65,9 +65,8 @@ def GroupWheel(wheels):
 		cmd.delete(w, ch=True)
 		w = cmd.parent(w, parent)[0]
 		ws.append(w)
-	cmd.select(ws, r=True)
-	cmd.makeIdentity(apply=True, t=1, r=1, s=1, n=0, pn=1)
-	cmd.CenterPivot()
+		cmd.makeIdentity(w, apply=True, t=1, r=1, s=1, n=0, pn=1)
+		cmd.CenterPivot(w)
 	return ws
 
 #绑定轮子添加轮子动画
@@ -84,10 +83,10 @@ def BindWheel():
 #获取物体包围盒
 def GetSize(obj):
 	count = len(cmd.filterExpand(obj+".vtx[*]", ex=True, fp=True , sm=31))
-	_min = list(cmd.getAttr(obj+".vrts[0]")[0])
-	_max = list(cmd.getAttr(obj+".vrts[0]")[0])
-	for i in range(count):		
-		pos = cmd.getAttr(obj+".vrts[%d]"%i)[0]
+	_min = arrayPlus(cmd.getAttr(obj+".pnts[0]")[0], cmd.getAttr(obj+".vrts[0]")[0])
+	_max = arrayPlus(cmd.getAttr(obj+".pnts[0]")[0], cmd.getAttr(obj+".vrts[0]")[0])
+	for i in range(count):
+		pos = arrayPlus(cmd.getAttr(obj+".pnts[%d]"%i)[0], cmd.getAttr(obj+".vrts[%d]"%i)[0])
 		_min[0] = min(_min[0], pos[0])
 		_min[1] = min(_min[1], pos[1])
 		_min[2] = min(_min[2], pos[2])
@@ -95,6 +94,23 @@ def GetSize(obj):
 		_max[1] = max(_max[1], pos[1])
 		_max[2] = max(_max[2], pos[2])
 	return (_max[0] - _min[0], _max[1] - _min[1], _max[2] - _min[2])
+
+def bakPivot(obj):
+	rp = cmd.getAttr(obj+".rp")[0]
+	rpt = cmd.getAttr(obj+".rpt")[0]
+	sp = cmd.getAttr(obj+".sp")[0]
+	spt = cmd.getAttr(obj+".spt")[0]
+	return (rp,rpt,sp,spt)
+
+def restorePivot(obj, pivotInfo):	
+	rp = pivotInfo[0]
+	rpt = pivotInfo[1]
+	sp = pivotInfo[2]
+	spt = pivotInfo[3]
+	cmd.setAttr(obj+".rp", rp[0], rp[1], rp[2])
+	cmd.setAttr(obj+".rpt", rpt[0], rpt[1], rpt[2])
+	cmd.setAttr(obj+".sp", sp[0], sp[1], sp[2])
+	cmd.setAttr(obj+".spt", spt[0], spt[1], spt[2])
 
 #设置炮台,制作动画
 def SetCannon(cannon, angle, distance):
@@ -109,9 +125,12 @@ def SetCannon(cannon, angle, distance):
 	cannonShape = cmd.listRelatives(cannon, s=True, f=True)[0]
 	barrel1Shape = cmd.listRelatives(barrel1, s=True, f=True)[0]
 	barrel2Shape = cmd.listRelatives(barrel2, s=True, f=True)[0]
+	pivotInfo = bakPivot(cannon)
 	newCanon = cmd.polyUnite([cannonShape, barrel1Shape], name="Cannon")[0]
 	cmd.delete(newCanon, ch=True)
 	newCanon = cmd.parent(newCanon, parent)[0]
+	cmd.makeIdentity(newCanon, apply=True, t=1, r=1, s=1, n=0, pn=1)
+	restorePivot(newCanon, pivotInfo)
 	barrel2 = cmd.parent(barrel2, newCanon)[0]
 	start = cmd.getAttr(barrel2+".t")[0]
 	print("Start: "+str(start))
@@ -150,11 +169,13 @@ def AutoPreBind():
 		c = Classify(tank)
 		cannon = c[1]
 		wheels = c[2]
+		pivotInfo = bakPivot(cannon)
 		cannon = cmd.parent(cannon, tank)[0]
 		wheels = GroupWheel(wheels)
 		for i in range(len(wheels)):
 			wheels[i] = cmd.parent(wheels[i], tank)[0]
 		cmd.select(wheels, r=True)
+		restorePivot(cannon, pivotInfo)
 
 def AutoDoBind():
 	tanks = cmd.ls(sl = True, l = True, type = "transform")
@@ -171,7 +192,9 @@ def AutoDoBind():
 		root = bindInfo[1]
 		wheel = cmd.parent(wheel, root)[0]
 		cannon = cmd.parent(cannon, root)[0]
+		cmd.setAttr(wheel+".inheritsTransform", False)
 		cmd.setAttr(tank+".translate",t[0],t[1],t[2])
+	cmd.select(tanks, r=True)
 
 def DoCannons(angle = 10, distance = 0.2):	
 	tanks = cmd.ls(sl = True, l = True, type = "transform")
@@ -179,6 +202,7 @@ def DoCannons(angle = 10, distance = 0.2):
 		c = Classify(tank)
 		cannon = c[1]
 		SetCannon(cannon, angle, distance)
+	cmd.select(tanks, r=True)
 
 #坦克工具窗口
 def ShowWindowTank():
