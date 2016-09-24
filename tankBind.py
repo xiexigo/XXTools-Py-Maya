@@ -96,12 +96,13 @@ def GetSize(obj):
 
 #设置炮台,制作动画
 def SetCannon(angle = 10, distance = 0.2):
+	angle = -angle
 	cannon = cmd.ls(sl=True, l = True, type = "transform")[0]
 	barrel1 = cmd.listRelatives(cannon, c=True, f=True, typ="transform")[0]
 	barrel2 = cmd.listRelatives(barrel1, c=True, f=True, typ="transform")[0]
 	size = GetSize(barrel2)
 	print(size)
-	cmd.setAttr(barrel1+".rotateX", -10)
+	cmd.setAttr(barrel1+".rotateX", angle)
 	parent = cmd.listRelatives(cannon, parent = True, fullPath = True)[0]
 	barrel2 = cmd.parent(barrel2, parent)[0]
 	cannonShape = cmd.listRelatives(cannon, s=True, f=True)[0]
@@ -112,19 +113,20 @@ def SetCannon(angle = 10, distance = 0.2):
 	newCanon = cmd.parent(newCanon, parent)[0]
 	barrel2 = cmd.parent(barrel2, newCanon)[0]
 	start = cmd.getAttr(barrel2+".t")[0]
-	print(start)
+	print("Start: "+str(start))
 	d = size[2]*distance
 	offset = (0.0, math.sin(math.radians(angle))*d, math.cos(math.radians(angle))*d)
-	print(offset)
-	end = (start[0]+offset[0], start[1]-offset[1], start[1]-offset[1])
-	print(end)
+	print("Offset: "+str(offset))
+	end = (start[0]-offset[0], start[1]+offset[1], start[2]-offset[2])
+	print("End: "+str(end))
 	cmd.setKeyframe(barrel2, at="translateY", v=start[1], t=31)
 	cmd.setKeyframe(barrel2, at="translateZ", v=start[2], t=31)
 	cmd.setKeyframe(barrel2, at="translateY", v=end[1], t=33)
 	cmd.setKeyframe(barrel2, at="translateZ", v=end[2], t=33)
 	cmd.setKeyframe(barrel2, at="translateY", v=start[1], t=42)
 	cmd.setKeyframe(barrel2, at="translateZ", v=start[2], t=42)
-	cmd.keyTangent(attr, itt = "linear", ott = "linear")
+	cmd.keyTangent(barrel2, at="translateY", itt = "spline", ott = "spline")
+	cmd.keyTangent(barrel2, at="translateZ", itt = "spline", ott = "spline")
 	barrel2 = cmd.rename(barrel2, "barrel1")
 
 #坦克工具窗口
@@ -136,7 +138,8 @@ def ShowWindowTank():
 	cmd.button(label="全骨骼版坦克绑定（过期）", w=300, command=("TankBind()"))
 	cmd.button(label="左右轮合并", w=300, command=("GroupWheel()"))
 	cmd.button(label="绑定轮子", w=300, command=("BindWheel()"))
-	cmd.button(label="设置炮台", w=300, command=("SetCannon()"))
+	angleField = cmd.floatSliderGrp(label='炮管仰角', extraLabel='℃', field=True, minValue=0.0, maxValue=30.0, value=0, step=5, fieldStep=5)
+	cmd.button(label="设置炮台", w=300, command=lambda c:SetCannon(angle=cmd.floatSliderGrp(angleField, q=True, v=True)))
 	cmd.setParent('..')
 	cmd.showWindow(window)
 
