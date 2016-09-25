@@ -204,6 +204,24 @@ def DoCannons(angle = 10, distance = 0.2):
 		SetCannon(cannon, angle, distance)
 	cmd.select(tanks, r=True)
 
+def Export(path):
+	tanks = cmd.ls(sl = True, l = True, type = "transform")
+	for tank in tanks:		
+		t = cmd.getAttr(tank+".translate")[0]
+		cmd.setAttr(tank+".translate",0,0,0)
+		cs = cmd.listRelatives(tank, c=True, f=True, typ="transform")
+		objs = []
+		for i in range(len(cs)):
+			cs[i] = cmd.parent(cs[i], w=True)[0]
+			objs.append(cs[i])
+			objs.extend(xxt.getAllChildren(cs[i]))
+		cmd.select(objs, r=True)
+		outpath = path + xxt.getNoPathName(tank)
+		cmd.file(outpath, force=True, options="v=0;", typ="FBX export", pr=True, es=True)
+		for i in range(len(cs)):			
+			cs[i] = cmd.parent(cs[i], tank)[0]
+		cmd.setAttr(tank+".translate",t[0],t[1],t[2])
+
 #坦克工具窗口
 def ShowWindowTank():
 	if cmd.window("windowTank", ex=True):
@@ -215,6 +233,8 @@ def ShowWindowTank():
 	cmd.button(label="绑定坦克（只有轮子）", w=300, command=("AutoDoBind()"))
 	angleField = cmd.floatSliderGrp(label='炮管仰角', extraLabel='℃', field=True, minValue=0.0, maxValue=30.0, value=0, step=5, fieldStep=5)
 	cmd.button(label="设置炮台", w=300, command=lambda c:DoCannons(angle=cmd.floatSliderGrp(angleField, q=True, v=True)))
+	exportPath = cmd.textField(w=300);
+	cmd.button(label="导出", w=300, command=lambda c:Export(cmd.textField(exportPath, q=True, text=True)))
 	cmd.setParent('..')
 	cmd.showWindow(window)
 
